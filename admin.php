@@ -11,17 +11,17 @@ $exp_url = "/wp-json/ecranvillage-api/v2/export/download";
 	<p><strong>4.</strong> Crée des nouvelles <a href="<?php echo $app_url . '/admin/seance/new'; ?>" class="button button-primary" target="plannings">Séances</a> et/ou leurs associations aux Villages et Films dans l'application.</p>
 	<h2><?php _e('Shortcode'); ?> [seances]</h2>
 	<p>Utilise le shortcode <strong>[seances]</strong> dans les articles WordPress pour montrer un tableau des séances. Par défaut, le shortcode cherche le film du même titre. Il faut que les titres du film et de l'article correspondent exactement. Au cas où le bon film n'est pas trouvé automatiquement, il y a deux méthodes pour faire montrer les bonnes séances:</p>
-        <ol>
-                <li><strong>Associer l'article au bon film.</strong>
-                        <ul>
-                                <li>- Ouvre la page <a href="<?php echo $app_url . '/admin/film'; ?>" target="plannings">Listing des Films</a> dans l'application Plannings et note le chiffre de l'<strong>Id</strong> du film souhaité.</li>
-                                <li>- Reviens sur l'article WordPress pour modifier et trouve le bloc "Champs personnalisés" en dessous le bloc du texte principal. Si il n'y est pas visible, ouvre l'onglet "Options de l'écran" à droite en haut de la page et coche la case "Champs personnalisés."</li>
-                                <li>- Dans le bloc "Champs personnalisés" sélectionne "film_id" sous "Nom" et entre le chiffre de l'Id du film souhaité sous "Valeur". Si il y a déjà un champ "film_id" existant, modifie ou supprime le. Il faut pas y avoir plusieurs champs avec le même nom "film_id".</li>
-                        </ul>
-                </li>
-                <li><strong>Associer le shortcode [seances] au bon film.</strong><br>
-                Ajoute au shortcode un des paramètres disponible pour forcer l'association à un film dans l'application de Plannings. Par exemple <strong>[seances id="1"]</strong> ou <strong>[seances titrefilm="COURT ECOLE ST JEAN"]</strong> montre les séances du film "COURT ECOLE ST JEAN" même si le titre je l'article ne corresponds pas au titre du film.</li>
-        </ol>
+  <ol>
+		<li><strong>Associer l'article au bon film.</strong>
+			<ul>
+				<li>- Ouvre la page <a href="<?php echo $app_url . '/admin/film'; ?>" target="plannings">Listing des Films</a> dans l'application Plannings et note le chiffre de l'<strong>Id</strong> du film souhaité.</li>
+				<li>- Reviens sur l'article WordPress pour modifier et trouve le bloc "Champs personnalisés" en dessous le bloc du texte principal. Si il n'y est pas visible, ouvre l'onglet "Options de l'écran" à droite en haut de la page et coche la case "Champs personnalisés."</li>
+				<li>- Dans le bloc "Champs personnalisés" sélectionne "film_id" sous "Nom" et entre le chiffre de l'Id du film souhaité sous "Valeur". Si il y a déjà un champ "film_id" existant, modifie ou supprime le. Il faut pas y avoir plusieurs champs avec le même nom "film_id".</li>
+			</ul>
+		</li>
+		<li><strong>Associer le shortcode [seances] au bon film.</strong><br>
+			Ajoute au shortcode un des paramètres disponible pour forcer l'association à un film dans l'application de Plannings. Par exemple <strong>[seances id="1"]</strong> ou <strong>[seances titrefilm="COURT ECOLE ST JEAN"]</strong> montre les séances du film "COURT ECOLE ST JEAN" même si le titre je l'article ne corresponds pas au titre du film.</li>
+  </ol>
 	<p><strong>Paramètres</strong></p>
 	<dl>
 		<dt><strong>id</strong></dt>
@@ -37,7 +37,5 @@ $exp_url = "/wp-json/ecranvillage-api/v2/export/download";
 	<p>Astuce: Il n'y a pas de limite au nombre de shortcodes, avec différentes paramètres si besoin, sur une seul page. </p>
 	<h2><?php _e('Tools'); ?></h2>
 	<p>Bientôt des boutons pour [vider le cache des films], [vider le cache des lieux] et [vider tous les caches des séances] ici...</p>
-	
 <!--	<iframe src="<?php echo $app_url . '/admin/film/import'; ?>" style="width: 100%; height: 1220px; border-radius: 6px"></iframe> -->
-
 </div>
