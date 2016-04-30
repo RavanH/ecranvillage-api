@@ -1,2 +1,1 @@
-# ecranvillage-api
-Écran Village Plannings API
+# Écran Village Plannings API
