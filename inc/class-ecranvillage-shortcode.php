@@ -7,7 +7,7 @@
 
 class EcranVillage_Shortcode {
 
-  public static $app_url = 'http://planning-ecranvillage.herokuapp.com';
+  public static $app_url = 'http://calendrierecranvillage.deploiement.ovh';
 
   private static $timeout = 3;
 
