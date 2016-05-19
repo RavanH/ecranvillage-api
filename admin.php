@@ -5,6 +5,7 @@ $exp_url = "/wp-json/ecranvillage-api/v2/export/download";
 
 <div class="wrap">
 	<h1>Plannings</h1>
+
 	<h2>Export / Import</h2>
 	<p>Pour importer les nouveaux films, il suffit d'aller sur cette page <a href="<?php echo $app_url . '/ecranvillage'; ?>" class="button button-primary" target="plannings">Import ecranvillage</a></p>
 	<p>Avec cette méthode les films importés ont bien le même id que leur page Wordpress et les liens marchent bien !</p>
@@ -38,6 +39,7 @@ $exp_url = "/wp-json/ecranvillage-api/v2/export/download";
 		<dd>Alignement des textes en format "simple". Peut être "left", "center", "right" ou "justify".</dd>
 	</dl>
 	<p>Astuce: Il n'y a pas de limite au nombre de shortcodes, avec différentes paramètres si besoin, sur une seul page. </p>
+
 	<h2><?php _e('Tools'); ?></h2>
 	<p>Bientôt des boutons pour [vider le cache des films], [vider le cache des lieux] et [vider tous les caches des séances] ici...</p>
 </div>
