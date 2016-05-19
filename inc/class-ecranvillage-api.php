@@ -17,7 +17,7 @@ class EcranVillage_API {
   public static function api_response( $request ) {
     // get posts array from category
     $posts = get_posts( array(
-      'category_name' => 'a-laffiche,a-venir',
+      'category_name' => 'a-laffiche,a-venir,export',
       'posts_per_page' => -1
     ) );
 
