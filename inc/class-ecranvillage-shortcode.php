@@ -25,6 +25,7 @@ class EcranVillage_Shortcode {
     // for debugging
     //delete_transient( 'films' );
     //delete_transient( 'seances_'.$post->ID );
+    //delete_transient( 'villages');
 
     // determine the associated ID
     if ( empty( $id ) || !is_numeric( $id ) ) {
@@ -63,10 +64,10 @@ class EcranVillage_Shortcode {
     if( !is_wp_error( $villages_json ) ) {
       foreach ( $villages_json as $village ) {
         if ( is_object($village) ) {
-          $id = property_exists($village, 'id') ? $village->id : 0;
+          $village_id = property_exists($village, 'id') ? $village->id : 0;
           $salle = property_exists($village, 'salle') ? $village->salle : '';
           $espace = property_exists($village, 'espace') ? ', ' . $village->espace : '';
-          $villages[$id] = $salle . $espace;
+          $villages[$village_id] = $salle . $espace;
         }
       }
     }
@@ -81,8 +82,8 @@ class EcranVillage_Shortcode {
     $output = '';
     $h = 0;
     $now = time();
-    foreach ( $seances as $village_id => $_seances ) {
-      $village = array_key_exists($village_id, $villages) ? $villages[$village_id] : '';
+    foreach ( $seances as $_village_id => $_seances ) {
+      $village = array_key_exists($_village_id, $villages) ? $villages[$_village_id] : '';
 
       if ( 'simple' === $format ) {
         $output .= "<dt style=\"text-align:$align;color: #ff6600\"><strong>$village</strong></dt><dd style=\"margin-bottom:0;text-align:$align\"><ul style=\"margin:0\">";
@@ -183,10 +184,10 @@ class EcranVillage_Shortcode {
 
   private static function get_transient_or_remote( $transient, $expiration = 0, $url = '' ) {
 
-    // Do we need to turn off the object cache temporarily while we deal with
+    // W3TC: Do we need to turn off the object cache temporarily while we deal with
     // transients, as the W3 Total Cache conflicts with our work if transient
-    // expiration is (much) longer than the object cache expiration?
-    // TODO: Test this theory or ask Townes...
+    // expiration is longer than the object cache expiration?
+    // TODO: Test this theory or ask Frediric Townes...
 
     //global $_wp_using_ext_object_cache;
     //$_wp_using_ext_object_cache_previous = $_wp_using_ext_object_cache;
@@ -222,7 +223,7 @@ class EcranVillage_Shortcode {
     $tzstring = get_option('timezone_string');
     if ( empty($tzstring) ) { // Create a UTC+- zone if no timezone string exists
       if (0 == $current_offset) {
-        $tzstring = 'UTC+0';
+        $tzstring = 'UTC';
       } elseif ($current_offset < 0) {
         $tzstring = 'UTC' . $current_offset;
       } else {
@@ -235,7 +236,8 @@ class EcranVillage_Shortcode {
     $villages_seances = array();
     foreach ( $json as $_seance ) {
       if ( is_object($_seance) ) {
-        if ( !isset($film_id) || !property_exists($_seance, 'film_id') || $_seance->village_id == $film_id ) {
+        // TODO fix this - now filters out everything... but why? is $_seance->film_id == $film_id never so?
+        if ( !isset($film_id) || ( property_exists($_seance, 'film_id') && $_seance->film_id == $film_id ) ) {
           $village_id = property_exists($_seance, 'village_id') ? $_seance->village_id : 0;
           $timestamp = property_exists($_seance, 'horaire') ? strtotime( $_seance->horaire ) : 0;
           $version = property_exists($_seance, 'version') ? $_seance->version : '';
