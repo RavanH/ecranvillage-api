@@ -236,7 +236,6 @@ class EcranVillage_Shortcode {
     $villages_seances = array();
     foreach ( $json as $_seance ) {
       if ( is_object($_seance) ) {
-        // TODO fix this - now filters out everything... but why? is $_seance->film_id == $film_id never so?
         if ( !isset($film_id) || ( property_exists($_seance, 'film_id') && $_seance->film_id == $film_id ) ) {
           $village_id = property_exists($_seance, 'village_id') ? $_seance->village_id : 0;
           $timestamp = property_exists($_seance, 'horaire') ? strtotime( $_seance->horaire ) : 0;
