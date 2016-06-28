@@ -90,7 +90,7 @@ class EcranVillage_Shortcode {
       } else {
         $i = count($_seances);
         $rowspan = $i > 1 ? " rowspan=\"$i\"" : '';
-        $style = ++$h%2 ? '' : ' style="background-color:rgba(125,125,125,.1")';
+        $style = ++$h%2 ? '' : ' style="background-color:rgba(125,125,125,.1)"';
         $output .= "<tr$style><td$rowspan style=\"vertical-align:top;padding-left:2px\"><strong>$village</strong></td>";
       }
 
