@@ -95,9 +95,9 @@ class EcranVillage_Shortcode {
         $output .= '<table style="width:100%"><caption style="text-align:left"><strong>'.$village.'</strong></caption><thead>'
           . '<tr style="text-align:left;background-color:rgba(125,125,125,.6)">'
           . '<th style="padding-left:3px;width:40%">Date</th>'
-          . '<th style="width:20%">Heure</th>'
+          . '<th style="width:15%">Heure</th>'
           . '<th style="width:15%">Version</th>'
-          . '<th style="width:25%">Extra info</th>'
+          . '<th style="width:30%">Extra info</th>'
           . '</tr></thead><tbody>';
       }
 
