@@ -13,7 +13,7 @@ class EcranVillage_API {
   * @param WP_REST_Request $request Full data about the request.
   * @return WP_Error|WP_REST_Response
   */
-  
+
   public static function api_response( $request ) {
     // get posts array from category
     $posts = get_posts( array(
@@ -55,7 +55,8 @@ class EcranVillage_API {
     $postdata = array();
     $postdata['id'] = $item->ID;
     $postdata['titrefilm'] = $item->post_title;
-    $postdata['description'] = strip_tags( apply_filters( 'get_the_excerpt', strip_shortcodes($item->post_excerpt) ) );
+    $postdata['description'] = strip_tags( apply_filters( 'get_the_excerpt', strip_shortcodes( $item->post_excerpt ) ) );
+    $postdata['affiche'] = get_the_post_thumbnail_url( $item->ID, 'full' );
 
     return $postdata;
   }
