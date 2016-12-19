@@ -78,6 +78,10 @@ class EcranVillage_Shortcode {
     // prepare the seances array
     $seances = self::prepare_seances( $seances_json, $id );
 
+    if ( !$seances ) {
+     return "<p style=\"text-align:$align\">Aucune séance trouvée.</p><!-- Empty response -->";
+    }
+
     // build our output from array
     $output = '';
     $h = 0;
@@ -88,54 +92,44 @@ class EcranVillage_Shortcode {
       if ( 'simple' === $format ) {
         $output .= "<dt style=\"text-align:$align;color: #ff6600\"><strong>$village</strong></dt><dd style=\"margin-bottom:0;text-align:$align\"><ul style=\"margin:0\">";
       } else {
-        $i = count($_seances);
-        $rowspan = $i > 1 ? " rowspan=\"$i\"" : '';
-        $style = ++$h%2 ? '' : ' style="background-color:rgba(125,125,125,.1)"';
-        $output .= "<tr$style><td$rowspan style=\"vertical-align:top;padding-left:2px\"><strong>$village</strong></td>";
+        $output .= '<table style="width:100%"><caption style="text-align:left"><strong>'.$village.'</strong></caption><thead>'
+          . '<tr style="text-align:left;background-color:rgba(125,125,125,.6);padding-left:1px">'
+          . '<th style="padding-left:2px">Date et heure</th>'
+          . '<th>Version</th>'
+          . '<th>Extra info</th>'
+          . '</tr></thead><tbody>';
       }
 
       $j = 0;
       foreach ( $_seances as $timestamp => $_data ) {
         $date = ('simple' === $format) ? strftime('%a %d/%m - %kh%M', $timestamp) : strftime('%A %e %B @ %kh%M', $timestamp);
         $version = isset($_data['version']) ? $_data['version'] : '';
+        $info = isset($_data['statut']) ? $_data['statut'] : '';
         $faded = $timestamp < $now ? 'opacity:.5;' : '';
+                
         //del text-decoration: line-through;
-        if ( isset($_data['statut']) && $_data['statut'] == 'Annulée' ) {
+        if ( !empty($_data['annulee']) ) {
           $deleted = 'text-decoration:line-through;';
           $date = '<del>' . $date . '</del>';
           $version = '';
+          $info = ( 'simple' === $format ) ? '' : 'Annulée';
         } else {
           $deleted = '';
         }
 
         if ( 'simple' === $format ) {
-          $output .= '<li style="' . $faded . $deleted . '">' . $date . ( !empty($version) ? ' - ' . $version : '' ) . '</li>';
+          $output .= '<li style="' . $faded . $deleted . '">' . $date . ( !empty($version) ? ' - ' . $version : '' ) . ( !empty($info) ? ' - ' . $info : '' ) . '</li>';
         } else {
           $output .= ++$j > 1 ? "<tr$style>" : '';
-          $output .= "<td style=\"$faded$deleted\">$version</td><td style=\"text-align:right;padding-right:0;$faded$deleted\">$date</td>";
+          $output .= "<td style=\"$faded$deleted\">$date</td><td style=\"$faded\">$version</td><td style=\"$faded\">$info</td>";
         }
       }
 
-      $output .= ( 'simple' === $format ) ? '</ul></dd>' : '</tr>';
+      $output .= ( 'simple' === $format ) ? '</ul></dd>' : '</tbody></table>';
     }
-
-    // wrap it up
-    if ( empty($output) ) {
-      $output = "<p style=\"text-align:$align\">Aucune séance trouvée.</p><!-- Empty response -->";
-    } elseif ('simple' === $format) {
-      $output = "<dl style=\"margin:0 0 1.625em 0\">$output</dl>";
-    } else {
-      $output = '<table style="width:100%"><thead>'
-      . '<tr style="text-align:left;background-color:rgba(125,125,125,.6);padding-left:1px">'
-      . '<th style="padding-left:2px">Lieu</th>'
-      . '<th>Version</th>'
-      . '<th style="text-align:right">Date et heure</th>'
-      . '</tr></thead><tbody>'
-      . $output
-      . '</tbody></table>';
-    }
-
-    return $output;
+    
+    // wrap it up and return
+    return ( 'simple' === $format ) ? '<dl style="margin:0 0 1.625em 0">'.$output.'</dl>' : $output;
   }
 
   /**
