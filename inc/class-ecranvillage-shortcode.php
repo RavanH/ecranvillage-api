@@ -93,10 +93,10 @@ class EcranVillage_Shortcode {
         $output .= "<dt style=\"text-align:$align;color: #ff6600\"><strong>$village</strong></dt><dd style=\"margin-bottom:0;text-align:$align\"><ul style=\"margin:0\">";
       } else {
         $output .= '<table style="width:100%"><caption style="text-align:left"><strong>'.$village.'</strong></caption><thead>'
-          . '<tr style="text-align:left;background-color:rgba(125,125,125,.6);padding-left:1px">'
-          . '<th style="padding-left:2px">Date et heure</th>'
-          . '<th>Version</th>'
-          . '<th>Extra info</th>'
+          . '<tr style="text-align:left;background-color:rgba(125,125,125,.6)">'
+          . '<th style="padding-left:3px;width:60%">Date et heure</th>'
+          . '<th style="width:15%">Version</th>'
+          . '<th style="width:25%">Extra info</th>'
           . '</tr></thead><tbody>';
       }
 
@@ -106,7 +106,7 @@ class EcranVillage_Shortcode {
         $version = isset($_data['version']) ? $_data['version'] : '';
         $info = isset($_data['statut']) ? $_data['statut'] : '';
         $faded = $timestamp < $now ? 'opacity:.5;' : '';
-                
+
         //del text-decoration: line-through;
         if ( !empty($_data['annulee']) ) {
           $deleted = 'text-decoration:line-through;';
@@ -118,7 +118,7 @@ class EcranVillage_Shortcode {
         }
 
         if ( 'simple' === $format ) {
-          $output .= '<li style="' . $faded . $deleted . '">' . $date . ( !empty($version) ? ' - ' . $version : '' ) . ( !empty($info) ? ' - ' . $info : '' ) . '</li>';
+          $output .= '<li style="' . $faded . $deleted . '">' . ( !empty($info) ? '<em>' . $info . '</em> : ' : '' ) . $date . ( !empty($version) ? ' - ' . $version : '' ) . '</li>';
         } else {
           $output .= ++$j > 1 ? "<tr$style>" : '';
           $output .= "<td style=\"$faded$deleted\">$date</td><td style=\"$faded\">$version</td><td style=\"$faded\">$info</td>";
@@ -127,7 +127,7 @@ class EcranVillage_Shortcode {
 
       $output .= ( 'simple' === $format ) ? '</ul></dd>' : '</tbody></table>';
     }
-    
+
     // wrap it up and return
     return ( 'simple' === $format ) ? '<dl style="margin:0 0 1.625em 0">'.$output.'</dl>' : $output;
   }
