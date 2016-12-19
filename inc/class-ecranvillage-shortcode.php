@@ -94,7 +94,8 @@ class EcranVillage_Shortcode {
       } else {
         $output .= '<table style="width:100%"><caption style="text-align:left"><strong>'.$village.'</strong></caption><thead>'
           . '<tr style="text-align:left;background-color:rgba(125,125,125,.6)">'
-          . '<th style="padding-left:3px;width:60%">Date et heure</th>'
+          . '<th style="padding-left:3px;width:40%">Date</th>'
+          . '<th style="width:20%">Heure</th>'
           . '<th style="width:15%">Version</th>'
           . '<th style="width:25%">Extra info</th>'
           . '</tr></thead><tbody>';
@@ -102,26 +103,25 @@ class EcranVillage_Shortcode {
 
       $j = 0;
       foreach ( $_seances as $timestamp => $_data ) {
-        $date = ('simple' === $format) ? strftime('%a %d/%m - %kh%M', $timestamp) : strftime('%A %e %B @ %kh%M', $timestamp);
+        $date = ('simple' === $format) ? ucfirst( strftime('%a %d/%m', $timestamp) ) : ucfirst( strftime('%A %e %B', $timestamp) );
+        $heure = strftime('%kh%M', $timestamp);
         $version = isset($_data['version']) ? $_data['version'] : '';
         $info = isset($_data['statut']) ? $_data['statut'] : '';
         $faded = $timestamp < $now ? 'opacity:.5;' : '';
 
-        //del text-decoration: line-through;
+        // add del tags if cancelled
         if ( !empty($_data['annulee']) ) {
-          $deleted = 'text-decoration:line-through;';
           $date = '<del>' . $date . '</del>';
+          $heure = '<del>' . $heure . '</del>';
           $version = '';
           $info = ( 'simple' === $format ) ? '' : 'Annulée';
-        } else {
-          $deleted = '';
         }
 
         if ( 'simple' === $format ) {
-          $output .= '<li style="' . $faded . $deleted . '">' . ( !empty($info) ? '<em>' . $info . '</em> : ' : '' ) . $date . ( !empty($version) ? ' - ' . $version : '' ) . '</li>';
+          $output .= '<li style="' . $faded . '">' . ( !empty($info) ? '<em>' . $info . '</em> : ' : '' ) . $date . ' ' . $heure . ( !empty($version) ? ' (' . $version . ')' : '' ) . '</li>';
         } else {
           $output .= ++$j > 1 ? "<tr$style>" : '';
-          $output .= "<td style=\"$faded$deleted\">$date</td><td style=\"$faded\">$version</td><td style=\"$faded\">$info</td>";
+          $output .= "<td style=\"$faded\">$date</td><td style=\"$faded\">$heure</td><td style=\"$faded\">$version</td><td style=\"$faded\">$info</td>";
         }
       }
 
