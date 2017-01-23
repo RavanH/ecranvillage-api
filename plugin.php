@@ -3,7 +3,7 @@
  * Plugin Name: Écran Village Plannings API
  * Plugin URI:
  * Description: JSON endpoint and seances shortcode for Plannings App Écran Village
- * Version: 1.99.7
+ * Version: 1.99.8
  * Author: RavanH
  * Author URI: http://status301.net/
  * License: GPLv3
