@@ -233,9 +233,12 @@ class EcranVillage_Shortcode {
         if ( !isset($film_id) || ( property_exists($_seance, 'film_id') && $_seance->film_id == $film_id ) ) {
           $village_id = property_exists($_seance, 'village_id') ? $_seance->village_id : 0;
           $timestamp = property_exists($_seance, 'horaire') ? strtotime( $_seance->horaire ) : 0;
-          $version = property_exists($_seance, 'version') ? $_seance->version : '';
-          $statut = property_exists($_seance, 'statut') ? $_seance->statut : '';
-          $villages_seances[$village_id][$timestamp] = array('version'=>$version,'statut'=>$statut);
+          // add the seance to the correct array key
+          $villages_seances[$village_id][$timestamp] = array(
+            'version' => property_exists($_seance, 'version') ? $_seance->version : '',
+            'statut'  => property_exists($_seance, 'statut') ? $_seance->statut : '',
+            'annulee' => property_exists($_seance, 'annulee') ? $_seance->annulee : ''
+          );
         }
       }
     }
