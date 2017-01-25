@@ -7,7 +7,7 @@
 
 class EcranVillage_Shortcode {
 
-  public static $app_url = 'http://calendrierecranvillage.deploiement.ovh';
+  public static $app_url = 'http://programme.ecranvillage.deploiement.ovh/';
 
   private static $timeout = 3;
 
@@ -65,9 +65,9 @@ class EcranVillage_Shortcode {
       foreach ( $villages_json as $village ) {
         if ( is_object($village) ) {
           $village_id = property_exists($village, 'id') ? $village->id : 0;
-          $salle = property_exists($village, 'salle') ? $village->salle : '';
-          $espace = property_exists($village, 'espace') ? ', ' . $village->espace : '';
-          $villages[$village_id] = $salle . $espace;
+          $commune = property_exists($village, 'commune') ? $village->commune : '';
+          $salle = property_exists($village, 'salle') ? ', ' . $village->salle : '';
+          $villages[$village_id] = $commune . $salle;
         }
       }
     }
@@ -106,7 +106,7 @@ class EcranVillage_Shortcode {
         $date = ('simple' === $format) ? ucfirst( strftime('%a %d/%m', $timestamp) ) : ucfirst( strftime('%A %e %B', $timestamp) );
         $heure = strftime('%kh%M', $timestamp);
         $version = isset($_data['version']) ? $_data['version'] : '';
-        $info = isset($_data['statut']) ? $_data['statut'] : '';
+        $info = isset($_data['info']) ? $_data['info'] : '';
         $faded = $timestamp < $now ? 'opacity:.5;' : '';
 
         // add del tags if cancelled
@@ -233,12 +233,11 @@ class EcranVillage_Shortcode {
         if ( !isset($film_id) || ( property_exists($_seance, 'film_id') && $_seance->film_id == $film_id ) ) {
           $village_id = property_exists($_seance, 'village_id') ? $_seance->village_id : 0;
           $timestamp = property_exists($_seance, 'horaire') ? strtotime( $_seance->horaire ) : 0;
-          // add the seance to the correct array key
           $villages_seances[$village_id][$timestamp] = array(
-            'version' => property_exists($_seance, 'version') ? $_seance->version : '',
-            'statut'  => property_exists($_seance, 'statut') ? $_seance->statut : '',
-            'annulee' => property_exists($_seance, 'annulee') ? $_seance->annulee : ''
-          );
+		'version' => property_exists($_seance, 'version') ? $_seance->version : '',
+		'info'  => property_exists($_seance, 'extras') ? $_seance->extras : '',
+		'annulee' => property_exists($_seance, 'annulee') ? $_seance->annulee : ''
+	  );
         }
       }
     }
