@@ -7,7 +7,7 @@
 
 class EcranVillage_Shortcode {
 
-  public static $app_url = 'http://calendrierecranvillage.deploiement.ovh';
+  public static $app_url = 'http://programme.ecranvillage.deploiement.ovh';
 
   private static $timeout = 3;
 
@@ -25,6 +25,7 @@ class EcranVillage_Shortcode {
     // for debugging
     //delete_transient( 'films' );
     //delete_transient( 'seances_'.$post->ID );
+    //delete_transient( 'villages');
 
     // determine the associated ID
     if ( empty( $id ) || !is_numeric( $id ) ) {
@@ -58,15 +59,15 @@ class EcranVillage_Shortcode {
     }
 
     // build villages array with ID and full name
-    $villages = [];
+    $villages = array();
     $villages_json = self::get_transient_or_remote('villages', 86400, trailingslashit(self::$app_url).'villages.json');
     if( !is_wp_error( $villages_json ) ) {
       foreach ( $villages_json as $village ) {
         if ( is_object($village) ) {
-          $id = property_exists($village, 'id') ? $village->id : 0;
-          $salle = property_exists($village, 'salle') ? $village->salle : '';
-          $espace = property_exists($village, 'espace') ? ', ' . $village->espace : '';
-          $villages[$id] = $salle . $espace;
+          $village_id = property_exists($village, 'id') ? $village->id : 0;
+          $commune = property_exists($village, 'commune') ? $village->commune : '';
+          $salle = property_exists($village, 'salle') ? ', ' . $village->salle : '';
+          $villages[$village_id] = $commune . $salle;
         }
       }
     }
@@ -75,56 +76,60 @@ class EcranVillage_Shortcode {
     setlocale(LC_TIME, get_locale().'.UTF8');
 
     // prepare the seances array
-    $seances = self::prepare_seances( $seances_json );
+    $seances = self::prepare_seances( $seances_json, $id );
+
+    if ( !$seances ) {
+     return "<p style=\"text-align:$align\">Aucune séance trouvée.</p><!-- Empty response -->";
+    }
 
     // build our output from array
     $output = '';
     $h = 0;
     $now = time();
-    foreach ( $seances as $village_id => $_seances ) {
-      $village = array_key_exists($village_id, $villages) ? $villages[$village_id] : '';
+    foreach ( $seances as $_village_id => $_seances ) {
+      $village = array_key_exists($_village_id, $villages) ? $villages[$_village_id] : '';
 
       if ( 'simple' === $format ) {
         $output .= "<dt style=\"text-align:$align;color: #ff6600\"><strong>$village</strong></dt><dd style=\"margin-bottom:0;text-align:$align\"><ul style=\"margin:0\">";
       } else {
-        $i = count($_seances);
-        $rowspan = $i > 1 ? " rowspan=\"$i\"" : '';
-        $style = ++$h%2 ? '': ' style="background-color:rgba(125,125,125,.1")';
-        $output .= "<tr$style><td$rowspan style=\"vertical-align:top;padding-left:2px\"><strong>$village</strong></td>";
+        $output .= '<table style="width:100%"><caption style="text-align:left"><strong>'.$village.'</strong></caption><thead>'
+          . '<tr style="text-align:left;background-color:rgba(125,125,125,.6)">'
+          . '<th style="padding-left:3px;width:40%">Date</th>'
+          . '<th style="width:15%">Heure</th>'
+          . '<th style="width:15%">Version</th>'
+          . '<th style="width:30%">Extra info</th>'
+          . '</tr></thead><tbody>';
       }
 
       $j = 0;
-      foreach ( $_seances as $timestamp => $version ) {
-        $date = ('simple' === $format) ? strftime('%a %d/%m - %kh%M', $timestamp) : strftime('%A %e %B @ %kh%M', $timestamp);
-        $faded = $timestamp < $now ? ' style="opacity:.5"' : '';
+      foreach ( $_seances as $timestamp => $_data ) {
+        $date = ('simple' === $format) ? ucfirst( strftime('%a %d/%m', $timestamp) ) : ucfirst( strftime('%A %e %B', $timestamp) );
+        $heure = strftime('%kh%M', $timestamp);
+        $version = isset($_data['version']) ? $_data['version'] : '';
+        $info = isset($_data['extras']) ? $_data['extras'] : '';
+        $faded = $timestamp < $now ? 'opacity:.5;' : '';
+
+        // add del tags if cancelled
+        if ( !empty($_data['annulee']) ) {
+          $date = '<del>' . $date . '</del>';
+          $heure = '<del>' . $heure . '</del>';
+          $version = '';
+          $info = ( 'simple' === $format ) ? '' : 'Annulée';
+        }
+
         if ( 'simple' === $format ) {
-          $output .= '<li><span' . $faded . '>' . $date . ( !empty($version) ? ' - ' . $version : '' ) . '</span></li>';
+          $output .= '<li style="' . $faded . '">' . ( !empty($info) ? '<em>' . $info . '</em> : ' : '' ) . $date . ' ' . $heure . ( !empty($version) ? ' (' . $version . ')' : '' ) . '</li>';
         } else {
           $output .= ++$j > 1 ? "<tr$style>" : '';
-          $output .= "<td>$version</td><td style=\"text-align:right;padding-right:0\"><span$faded>$date</span></td>";
+          $output .= "<td style=\"$faded\">$date</td><td style=\"$faded\">$heure</td><td style=\"$faded\">$version</td><td style=\"$faded\">$info</td>";
         }
       }
 
-      $output .= ( 'simple' === $format ) ? '</ul></dd>' : '</tr>';
+      $output .= ( 'simple' === $format ) ? '</ul></dd>' : '</tbody></table>';
     }
 
-    // wrap it up
-    if ( empty($output) ) {
-      $output = "<p style=\"text-align:$align\">Aucune séance trouvée.</p><!-- Empty response -->";
-    } elseif ('simple' === $format) {
-      $output = "<dl style=\"margin:0 0 1.625em 0\">$output</dl>";
-    } else {
-      $output = '<table style="width:100%"><thead>'
-      . '<tr style="text-align:left;background-color:rgba(125,125,125,.6);padding-left:1px">'
-      . '<th style="padding-left:2px">Lieu</th>'
-      . '<th>Version</th>'
-      . '<th style="text-align:right">Date et heure</th>'
-      . '</tr></thead><tbody>'
-      . $output
-      . '</tbody></table>';
-    }
-
-    return $output;
+    // wrap it up and return
+    return ( 'simple' === $format ) ? '<dl style="margin:0 0 1.625em 0">'.$output.'</dl>' : $output;
   }
 
   /**
@@ -173,10 +178,10 @@ class EcranVillage_Shortcode {
 
   private static function get_transient_or_remote( $transient, $expiration = 0, $url = '' ) {
 
-    // Do we need to turn off the object cache temporarily while we deal with
+    // W3TC: Do we need to turn off the object cache temporarily while we deal with
     // transients, as the W3 Total Cache conflicts with our work if transient
-    // expiration is (much) longer than the object cache expiration?
-    // TODO: Test this theory or ask Townes...
+    // expiration is longer than the object cache expiration?
+    // TODO: Test this theory or ask Frediric Townes...
 
     //global $_wp_using_ext_object_cache;
     //$_wp_using_ext_object_cache_previous = $_wp_using_ext_object_cache;
@@ -206,13 +211,13 @@ class EcranVillage_Shortcode {
   * @return array
   */
 
-  private static function prepare_seances( $json ) {
+  private static function prepare_seances( $json, $film_id = null ) {
     // set timezone for date to UNIX time conversion
     $current_offset = get_option('gmt_offset');
     $tzstring = get_option('timezone_string');
     if ( empty($tzstring) ) { // Create a UTC+- zone if no timezone string exists
       if (0 == $current_offset) {
-        $tzstring = 'UTC+0';
+        $tzstring = 'UTC';
       } elseif ($current_offset < 0) {
         $tzstring = 'UTC' . $current_offset;
       } else {
@@ -222,13 +227,19 @@ class EcranVillage_Shortcode {
     date_default_timezone_set($tzstring);
 
     // arrange seances per location id
-    $villages_seances = [];
+    $villages_seances = array();
     foreach ( $json as $_seance ) {
       if ( is_object($_seance) ) {
-        $village_id = property_exists($_seance, 'village_id') ? $_seance->village_id : 0;
-        $timestamp = property_exists($_seance, 'horaire') ? strtotime( $_seance->horaire ) : 0;
-        $version = property_exists($_seance, 'version') ? $_seance->version : '';
-        $villages_seances[$village_id][$timestamp] = $version;
+        if ( !isset($film_id) || ( property_exists($_seance, 'film_id') && $_seance->film_id == $film_id ) ) {
+          $village_id = property_exists($_seance, 'village_id') ? $_seance->village_id : 0;
+          $timestamp = property_exists($_seance, 'horaire') ? strtotime( $_seance->horaire ) : 0;
+          // add the seance to the correct array key
+          $villages_seances[$village_id][$timestamp] = array(
+            'version' => property_exists($_seance, 'version') ? $_seance->version : '',
+            'extras'  => property_exists($_seance, 'extras') ? $_seance->extras : '',
+            'annulee' => property_exists($_seance, 'annulee') ? $_seance->annulee : ''
+          );
+        }
       }
     }
 
@@ -245,7 +256,7 @@ class EcranVillage_Shortcode {
   * @copyright 2008 Kevin van Zonneveld (http://kevin.vanzonneveld.net)
   * @license   http://www.opensource.org/licenses/bsd-license.php New BSD Licence
   * @version   SVN: Release: $Id: ksortTree.inc.php 223 2009-01-25 13:35:12Z kevin $
-  * @link	  http://kevin.vanzonneveld.net/
+  * @link   http://kevin.vanzonneveld.net/
   *
   * @param   array $array
   * @return  true/false
