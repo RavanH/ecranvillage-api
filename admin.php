@@ -1,6 +1,14 @@
 <?php
-$app_url = "http://programme.ecranvillage.deploiement.ovh"; 
-$exp_url = "/wp-json/ecranvillage-api/v2/export/download";
+if ( class_exists('EcranVillage_Shortcode') ) {
+	$app_url = untrailingslashit(EcranVillage_Shortcode::$app_url);
+} else {
+	$app_url = '';
+?>
+    <div class="notice notice-error">
+        <p>Class EcranVillage_Shortcode missing! Please contact the administrator.</p>
+    </div>
+<?php
+}
 ?>
 
 <div class="wrap">

@@ -7,7 +7,7 @@
 
 class EcranVillage_Shortcode {
 
-  public static $app_url = 'http://programme.ecranvillage.deploiement.ovh';
+  public static $app_url = 'http://programme.ecranvillage.deploiement.ovh/';
 
   private static $timeout = 3;
 
