@@ -103,7 +103,7 @@ class EcranVillage_Shortcode {
 
       $j = 0;
       foreach ( $_seances as $timestamp => $_data ) {
-        $date = ('simple' === $format) ? ucfirst( strftime('%a %d/%m', $timestamp) ) : ucfirst( strftime('%A %e %B', $timestamp) );
+        $date = ('simple' === $format) ? ucfirst( strftime('%a %d %b', $timestamp) ) : ucfirst( strftime('%A %e %B', $timestamp) );
         $heure = strftime('%kh%M', $timestamp);
         $version = isset($_data['version']) ? $_data['version'] : '';
         $info = isset($_data['extras']) ? $_data['extras'] : '';
