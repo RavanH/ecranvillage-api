@@ -72,8 +72,8 @@ class EcranVillage_Shortcode {
       }
     }
 
-    // set locale for timestamp date conversion
-    setlocale(LC_TIME, get_locale().'.UTF8');
+    // set locale for timestamp date conversion, only needed for strftime()
+    //setlocale(LC_TIME, get_locale().'.UTF8');
 
     // prepare the seances array
     $seances = self::prepare_seances( $seances_json, $id );
@@ -94,17 +94,19 @@ class EcranVillage_Shortcode {
       } else {
         $output .= '<table style="width:100%"><caption style="text-align:left"><strong>'.$village.'</strong></caption><thead>'
           . '<tr style="text-align:left;background-color:rgba(125,125,125,.6)">'
-          . '<th style="padding-left:3px;width:40%">Date</th>'
-          . '<th style="width:15%">Heure</th>'
-          . '<th style="width:15%">Version</th>'
-          . '<th style="width:30%">Extra info</th>'
+          . '<th style="padding-left:3px">Date</th>' //;width:40%
+          . '<th>Heure</th>' // style="width:15%"
+          . '<th>Version</th>' // style="width:15%"
+          . '<th>Extra info</th>' // style="width:30%"
           . '</tr></thead><tbody>';
       }
 
       $j = 0;
       foreach ( $_seances as $timestamp => $_data ) {
-        $date = ('simple' === $format) ? ucfirst( strftime('%a %d %b', $timestamp) ) : ucfirst( strftime('%A %e %B', $timestamp) );
-        $heure = strftime('%kh%M', $timestamp);
+        //$date = ('simple' === $format) ? ucfirst( strftime('%a %d %b', $timestamp) ) : ucfirst( strftime('%A %e %B', $timestamp) );
+        //$heure = strftime('%kh%M', $timestamp);
+        $date = ('simple' === $format) ? ucfirst( date_i18n( 'D d M', $timestamp ) ) : ucfirst( date_i18n( get_option( 'date_format' ), $timestamp ) );
+        $heure = ('simple' === $format) ? date_i18n('G\hi', $timestamp) : date_i18n( get_option( 'time_format' ), $timestamp );
         $version = isset($_data['version']) ? $_data['version'] : '';
         $info = isset($_data['extras']) ? $_data['extras'] : '';
         $faded = $timestamp < $now ? 'opacity:.5;' : '';
