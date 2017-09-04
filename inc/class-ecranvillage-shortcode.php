@@ -122,7 +122,7 @@ class EcranVillage_Shortcode {
         if ( 'simple' === $format ) {
           $output .= '<li style="' . $faded . '">' . ( !empty($info) ? '<em>' . $info . '</em> : ' : '' ) . $date . ' ' . $heure . ( !empty($version) ? ' (' . $version . ')' : '' ) . '</li>';
         } else {
-          $output .= ++$j > 1 ? "<tr$style>" : '';
+          $output .= ++$j > 1 ? "<tr>" : '';
           $output .= "<td style=\"$faded\">$date</td><td style=\"$faded\">$heure</td><td style=\"$faded\">$version</td><td style=\"$faded\">$info</td>";
         }
       }
