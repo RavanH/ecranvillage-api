@@ -1,13 +1,11 @@
 <?php
 /**
-* Shortcode class
+* SEANCES Shortcode class
 *
 * @author RavanH
 */
 
 class EcranVillage_Shortcode {
-
-  public static $app_url = 'http://programme.ecranvillage.deploiement.ovh/';
 
   private static $timeout = 3;
 
@@ -27,10 +25,16 @@ class EcranVillage_Shortcode {
     //delete_transient( 'seances_'.$post->ID );
     //delete_transient( 'villages');
 
+	$app_url = untrailingslashit( get_option( 'ecranvillage_app_url' ) );
+	if ( false === $app_url ) {
+	  return "<p style=\"text-align:$align\"><em>Aucune séance trouvée.</em></p><!-- Error: missing App URL. -->";
+	}
+	$app_url = untrailingslashit( $app_url );
+
     // determine the associated ID
-    if ( empty( $id ) || !is_numeric( $id ) ) {
+    if ( empty( $id ) || ! is_numeric( $id ) ) {
       // get films json or abort mission
-      $films_json = self::get_transient_or_remote( 'films', 60, trailingslashit(self::$app_url).'films.json' );
+      $films_json = self::get_transient_or_remote( 'films', 600, $app_url.'/films.json' );
       if( is_wp_error( $films_json ) ) {
         $error_message = $films_json->get_error_message();
         return "<p style=\"text-align:$align\"><em>Aucune séance trouvée.</em></p><!-- Error: $error_message -->";
@@ -52,7 +56,7 @@ class EcranVillage_Shortcode {
     }
 
     // get seances json or abort mission
-    $seances_json = self::get_transient_or_remote( 'seances_'.$id, 3600, trailingslashit(self::$app_url).'films/'.$id.'.json' );
+    $seances_json = self::get_transient_or_remote( 'seances_'.$id, 3600, $app_url.'/films/'.$id.'.json' );
     if( is_wp_error( $seances_json ) ) {
       $error_message = $seances_json->get_error_message();
       return "<p style=\"text-align:$align\"><em>Aucune séance trouvée.</em></p><!-- Error: $error_message -->";
@@ -60,7 +64,7 @@ class EcranVillage_Shortcode {
 
     // build villages array with ID and full name
     $villages = array();
-    $villages_json = self::get_transient_or_remote('villages', 86400, trailingslashit(self::$app_url).'villages.json');
+    $villages_json = self::get_transient_or_remote('villages', 86400, $app_url.'/villages.json');
     if( !is_wp_error( $villages_json ) ) {
       foreach ( $villages_json as $village ) {
         if ( is_object($village) ) {
@@ -72,7 +76,7 @@ class EcranVillage_Shortcode {
       }
     }
 
-    // set locale for timestamp date conversion, only needed for strftime()
+    // set locale for timestamp date conversion in strftime()
     //setlocale(LC_TIME, get_locale().'.UTF8');
 
     // prepare the seances array
@@ -94,21 +98,20 @@ class EcranVillage_Shortcode {
       } else {
         $output .= '<table style="width:100%"><caption style="text-align:left"><strong>'.$village.'</strong></caption><thead>'
           . '<tr style="text-align:left;background-color:rgba(125,125,125,.6)">'
-          . '<th style="padding-left:3px">Date</th>' //;width:40%
-          . '<th>Heure</th>' // style="width:15%"
-          . '<th>Version</th>' // style="width:15%"
-          . '<th>Extra info</th>' // style="width:30%"
+          . '<th style="padding-left:3px;width:40%">Date</th>'
+          . '<th style="width:15%">Heure</th>'
+          . '<th style="width:15%">Version</th>'
+          . '<th style="width:30%">Extra info</th>'
           . '</tr></thead><tbody>';
       }
 
       $j = 0;
       foreach ( $_seances as $timestamp => $_data ) {
         //$date = ('simple' === $format) ? ucfirst( strftime('%a %d %b', $timestamp) ) : ucfirst( strftime('%A %e %B', $timestamp) );
-        //$heure = strftime('%kh%M', $timestamp);
         $date = ('simple' === $format) ? ucfirst( date_i18n( 'D d M', $timestamp ) ) : ucfirst( date_i18n( get_option( 'date_format' ), $timestamp ) );
-        $heure = ('simple' === $format) ? date_i18n('G\hi', $timestamp) : date_i18n( get_option( 'time_format' ), $timestamp );
+        $heure = date_i18n( get_option( 'time_format' ), $timestamp ); //('simple' === $format) ? date_i18n('G\hi', $timestamp) :
         $version = isset($_data['version']) ? $_data['version'] : '';
-        $info = isset($_data['extras']) ? $_data['extras'] : '';
+        $info = isset($_data['info']) ? $_data['info'] : '';
         $faded = $timestamp < $now ? 'opacity:.5;' : '';
 
         // add del tags if cancelled
@@ -122,7 +125,7 @@ class EcranVillage_Shortcode {
         if ( 'simple' === $format ) {
           $output .= '<li style="' . $faded . '">' . ( !empty($info) ? '<em>' . $info . '</em> : ' : '' ) . $date . ' ' . $heure . ( !empty($version) ? ' (' . $version . ')' : '' ) . '</li>';
         } else {
-          $output .= ++$j > 1 ? "<tr>" : '';
+          $output .= ++$j > 1 ? "<tr$style>" : '';
           $output .= "<td style=\"$faded\">$date</td><td style=\"$faded\">$heure</td><td style=\"$faded\">$version</td><td style=\"$faded\">$info</td>";
         }
       }
@@ -139,7 +142,7 @@ class EcranVillage_Shortcode {
   *
   * Always returns a WP_Error object or a decoded JSON array of objects.
   *
-  * @param string $path, self::$app_url, self::$timeout
+  * @param string $url, self::$timeout
   * @return array\obj JSON\WP_Error
   */
 
@@ -235,12 +238,11 @@ class EcranVillage_Shortcode {
         if ( !isset($film_id) || ( property_exists($_seance, 'film_id') && $_seance->film_id == $film_id ) ) {
           $village_id = property_exists($_seance, 'village_id') ? $_seance->village_id : 0;
           $timestamp = property_exists($_seance, 'horaire') ? strtotime( $_seance->horaire ) : 0;
-          // add the seance to the correct array key
           $villages_seances[$village_id][$timestamp] = array(
-            'version' => property_exists($_seance, 'version') ? $_seance->version : '',
-            'extras'  => property_exists($_seance, 'extras') ? $_seance->extras : '',
-            'annulee' => property_exists($_seance, 'annulee') ? $_seance->annulee : ''
-          );
+		'version' => property_exists($_seance, 'version') ? $_seance->version : '',
+		'info'  => property_exists($_seance, 'extras') ? $_seance->extras : '',
+		'annulee' => property_exists($_seance, 'annulee') ? $_seance->annulee : ''
+	  );
         }
       }
     }
@@ -258,7 +260,7 @@ class EcranVillage_Shortcode {
   * @copyright 2008 Kevin van Zonneveld (http://kevin.vanzonneveld.net)
   * @license   http://www.opensource.org/licenses/bsd-license.php New BSD Licence
   * @version   SVN: Release: $Id: ksortTree.inc.php 223 2009-01-25 13:35:12Z kevin $
-  * @link   http://kevin.vanzonneveld.net/
+  * @link	  http://kevin.vanzonneveld.net/
   *
   * @param   array $array
   * @return  true/false

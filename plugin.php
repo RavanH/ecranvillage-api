@@ -3,7 +3,7 @@
  * Plugin Name: Écran Village Plannings API
  * Plugin URI:
  * Description: JSON endpoint and seances shortcode for Plannings App Écran Village
- * Version: 1.99.9
+ * Version: 2.0
  * Author: RavanH
  * Author URI: http://status301.net/
  * License: GPLv3
@@ -24,6 +24,16 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+*/
+
+/*
+TODO
+-- add a delete_transient( 'seances_'.$post->ID ); on post update or delete
+-- add tools button to purge all (automatic) post2film associations with delete_post_meta( $post->ID, 'film_id', $id )
+-- add options:
+	-- which categories to include in the export JSON
+	-- transient expiration times
+-- add cuurent_user_can check for options and purge
 */
 
 /**
