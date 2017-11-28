@@ -3,14 +3,14 @@
  * Plugin Name: Écran Village Plannings API
  * Plugin URI:
  * Description: JSON endpoint and seances shortcode for Plannings App Écran Village
- * Version: 2.0
+ * Version: 2.1
  * Author: RavanH
  * Author URI: http://status301.net/
  * License: GPLv3
  */
 
 /*
-Copyright (C) 2016 RavanH
+Copyright (C) 2017 RavanH
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -33,27 +33,28 @@ TODO
 -- add options:
 	-- which categories to include in the export JSON
 	-- transient expiration times
--- add cuurent_user_can check for options and purge
+-- add current_user_can check for options and purge
 */
 
 /**
-* Shortcode
+* Shortcodes
 */
 
 /* include static class */
 include_once( __DIR__.'/inc/class-ecranvillage-shortcode.php' );
 
-add_shortcode('seances', array( 'EcranVillage_Shortcode', 'seances') );
-add_shortcode('séances', array( 'EcranVillage_Shortcode', 'seances') );
+add_shortcode( 'seances', array( 'EcranVillage_Shortcode', 'seances' ) );
+add_shortcode( 'séances', array( 'EcranVillage_Shortcode', 'seances' ) );
 
-add_filter('get_the_excerpt', 'do_shortcode', 99);
+add_shortcode( 'applink', array( 'EcranVillage_Shortcode', 'applink' ) );
+add_filter( 'get_the_excerpt', 'do_shortcode', 99 );
 
 /**
 * WP API
 */
 
 /* include static class */
-include_once( __DIR__.'/inc/class-ecranvillage-api.php' );
+include_once( __DIR__ . '/inc/class-ecranvillage-api.php' );
 
 /* create endpoints */
 add_action( 'rest_api_init', function () {
