@@ -142,7 +142,7 @@ else :
 
 	<div id="shortcodes" class="tab">
 		<h2><?php _e('Shortcode'); ?> [seances]</h2>
-		<p>Utilise le shortcode <strong>[seances]</strong> dans les articles WordPress pour montrer un tableau des séances. Par défaut, le shortcode cherche le film du même titre. Il faut que les titres du film et de l'article correspondent exactement. Au cas où le bon film n'est pas trouvé automatiquement, il y a deux méthodes pour faire montrer les bonnes séances:</p>
+		<p>Utilise le shortcode <strong>[seances /]</strong> dans les articles WordPress pour montrer un tableau des séances. Par défaut, le shortcode cherche le film du même titre. Il faut que les titres du film et de l'article correspondent exactement. Au cas où le bon film n'est pas trouvé automatiquement, il y a deux méthodes pour faire montrer les bonnes séances:</p>
 		<ol>
 			<li><strong>Associer l'article au bon film.</strong>
 				<ul>
@@ -165,8 +165,24 @@ else :
 			<dt><strong>align</strong></dt>
 			<dd>Alignement des textes en format "simple". Peut être "left", "center", "right" ou "justify".</dd>
 		</dl>
-		<p>Exemple: le shortcode [seances id="4882" format="simple"] cherche les séances du film avec ID 4882 dans l'application plannings et (si trouvé) montre les dans une liste.</p>
-		<p>Astuce: Il n'y a pas de limite au nombre de shortcodes, avec différentes paramètres si besoin, sur une seul page. </p>
+		<p>Exemple : le shortcode <code>[seances id="4882" format="simple" /]</code> cherche les séances du film avec ID 4882 dans l'application plannings et (si trouvé) montre les dans une liste.</p>
+		<p>Astuce : Il n'y a pas de limite au nombre de shortcodes, avec différentes paramètres si besoin, sur une seul page. </p>
+		<hr />
+		<h2><?php _e('Shortcode'); ?> [applink]</h2>
+		<p>Utilise le shortcode <strong>[applink]texte ou image[/applink]</strong> pour montrer un lien vers la page principal de l'application Plannings. L'adresse du lien corresponds au <strong>Plannings App URL</strong> sous l'onglet <strong>Réglages</strong>.</p>
+		<h3>Paramètres</h3>
+		<dl>
+			<dt><strong>title</strong></dt>
+			<dd>L'atribut 'title' ou <strong>tooltip</strong> du lien est le texte affiché au survol du souris.</dd>
+			<dt><strong>class</strong></dt>
+			<dd>L'attribut 'class' à joindre au lien. Dépends le thème du site</dd>
+			<dt><strong>target</strong></dt>
+			<dd>L'attribut 'target' à joindre au lien. Par exemple "_blank" pour ouvrir le lien dans une nouvelle fenêtre du navigateur.</dd>
+		</dl>
+		<p>Exemples :</p>
+		<p>Le shortcode de base <code>[applink /]</code> s'affiche comme <a href="<?php echo $app_url; ?>" target="_blank"><?php echo $app_url; ?></a></p>
+		<p>Le shortcode <code>[applink title="agenda d'Écran Village"]voir l'agenda' ici[/applink]</code> s'affiche comme <a href="<?php echo $app_url; ?>" target="_blank" title="agenda d'Écran Village">voir l'agenda' ici</a> (survolle pour voir le tooltip).</p>
+		<p>Le shortcode <code>[applink class="button"]AGENDA[/applink]</code> peut s'afficher comme <a href="<?php echo $app_url; ?>" class="button" target="_blank">AGENDA</a> mais cela dépends le thème du site.</p>
 	</div>
 
 	<div id="settings" class="tab">

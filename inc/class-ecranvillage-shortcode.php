@@ -9,27 +9,52 @@ class EcranVillage_Shortcode {
 
 	private static $timeout = 3;
 
+	/**
+	* Shortcode applink
+	*
+	* Always returns a string.
+	*
+	* @param array,string $atts, $content
+	* @return string
+	*/
+
 	public static function applink( $atts, $content = null ) {
 		extract( shortcode_atts( [
-			'text' => '',
-			'tooltip' => ''
+			'title' => '',
+			'class' => '',
+			'target' => ''
 			], $atts )
 		);
 
-		$app_url = untrailingslashit( get_option( 'ecranvillage_app_url' ) );
+		$app_url = get_option( 'ecranvillage_app_url' );
 
-		$anchor = ( !empty( $content ) ) ? $content : ( !empty( $text ) ) ? $text : $app_url;
+		if ( empty( $content ) ) $content = $app_url;
 
-		$output = '<a href=' . $app_url . '"';
-		if ( $tooltip && !empty( $text ) ) {
-			$output .= ' title="' . $text . '"';
+		$output = '<a href="' . esc_url( $app_url ) . '"';
+		if ( !empty( $title ) ) {
+			$output .= ' title="' . esc_attr( $title ) . '"';
 		}
-		$output .= '>' . $anchor . '</a>';
+		if ( !empty( $class ) ) {
+			$output .= ' class="' . esc_attr( $class ) . '"';
+		}
+		if ( !empty( $target ) ) {
+			$output .= ' target="' . esc_attr( $target ) . '"';
+		}
+		$output .= '>' . $content . '</a>';
 
 		return $output;
 	}
 
-	public static function seances( $atts, $content = null ) {
+	/**
+	* Shortcode seances
+	*
+	* Always returns a string.
+	*
+	* @param array $atts
+	* @return string
+	*/
+
+	public static function seances( $atts ) {
 		global $post;
 
 		extract( shortcode_atts( [
@@ -45,7 +70,7 @@ class EcranVillage_Shortcode {
 		//delete_transient( 'seances_'.$post->ID );
 		//delete_transient( 'villages');
 
-		$app_url = untrailingslashit( get_option( 'ecranvillage_app_url' ) );
+		$app_url = get_option( 'ecranvillage_app_url' );
 		if ( false === $app_url ) {
 			return "<p style=\"text-align:$align\"><em>Aucune séance trouvée.</em></p><!-- Error: missing App URL. -->";
 		}
@@ -127,9 +152,9 @@ class EcranVillage_Shortcode {
 
 			$j = 0;
 			foreach ( $_seances as $timestamp => $_data ) {
-				//$date = ('simple' === $format) ? ucfirst( strftime('%a %d %b', $timestamp) ) : ucfirst( strftime('%A %e %B', $timestamp) );
+
 				$date = ('simple' === $format) ? ucfirst( date_i18n( 'D d M', $timestamp ) ) : ucfirst( date_i18n( get_option( 'date_format' ), $timestamp ) );
-				$heure = date_i18n( get_option( 'time_format' ), $timestamp ); //('simple' === $format) ? date_i18n('G\hi', $timestamp) :
+				$heure = date_i18n( get_option( 'time_format' ), $timestamp );
 				$version = isset($_data['version']) ? $_data['version'] : '';
 				$info = isset($_data['info']) ? $_data['info'] : '';
 				$faded = $timestamp < $now ? 'opacity:.5;' : '';
