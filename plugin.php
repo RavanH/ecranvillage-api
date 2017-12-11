@@ -73,5 +73,5 @@ add_action( 'rest_api_init', function () {
 */
 
 add_action( 'admin_menu', function () {
-  add_menu_page( 'Plannings', 'Plannings', 'edit_pages', 'ecranvillage-api/admin.php', '', 'dashicons-editor-video', 16 );
+  add_menu_page( 'Plannings', 'Plannings', 'edit_pages', 'ecranvillage-api/admin.php', '', 'dashicons-calendar-alt', 16 );
 } );
