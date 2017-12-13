@@ -79,7 +79,7 @@ class EcranVillage_Shortcode {
 		// determine the associated ID
 		if ( empty( $id ) || ! is_numeric( $id ) ) {
 			// get films json or abort mission
-			$films_json = self::get_transient_or_remote( 'films', 600, $app_url.'/films_a_venir.json' );
+			$films_json = self::get_transient_or_remote( 'films', 600, $app_url.'/tous_les_films.json' ); // films_a_venir.json == films modified last 2 months
 			if( is_wp_error( $films_json ) ) {
 				$error_message = $films_json->get_error_message();
 				return "<p style=\"text-align:$align\"><em>Aucune séance trouvée.</em></p><!-- Error: $error_message -->";
