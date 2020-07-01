@@ -186,7 +186,8 @@ class Shortcodes {
 		$output = '';
 		$now = time();
 		$logo = get_site_icon_url(); // integrate into theme... default logo in the dir
-		$image = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID))[0];
+		$image_src = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ) );
+		$image = is_array( $image_src ) ? '<meta itemprop="image" content="' . $image[0] . '">' : '';
 
 		foreach ( $seances as $_village_id => $_seances ) {
 			$village = array_key_exists($_village_id, $villages) ? $villages[$_village_id] : '';
@@ -230,12 +231,12 @@ class Shortcodes {
 
 				$rows .= ( 'simple' === $format )
 				 	? '<li itemscope itemtype="http://schema.org/ScreeningEvent"><meta itemprop="name" content="'
-						. $title . '"><meta itemprop="image" content="' . $image . '"><meta itemprop="startDate" content="' . $datetime . '">'
+						. $title . '">' . $image . '<meta itemprop="startDate" content="' . $datetime . '">'
 						. $location
 						. ( !empty($info) ? '<em>' . $info . '</em> : ' : '' ) . $date . ' ' . $heure . ( !empty($version) ? ' (<span itemprop="videoFormat">'
 						. $version . '</span>)' : '' )
 					: '<tr' . $class . ' itemscope itemtype="http://schema.org/ScreeningEvent">'
-						. '<td><meta itemprop="name" content="' . $title . '"><meta itemprop="image" content="' . $image . '">' . $date . '</td>'
+						. '<td><meta itemprop="name" content="' . $title . '">' . $image . $date . '</td>'
 						. '<td itemprop="startDate" content="' . $datetime . '">' . $heure . '</td>'
 						. '<td itemprop="videoFormat">' . $version . '</td>' . '<td class="extra">' . $info
 						. $location . '</td></tr>';
