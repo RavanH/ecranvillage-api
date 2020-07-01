@@ -1,0 +1,6 @@
+.gutenberg .wp-block-genres ul {
+  padding-left: 2.5em;
+}
+.gutenberg .wp-block-genres ul ul {
+  margin-top: 6px;
+}
