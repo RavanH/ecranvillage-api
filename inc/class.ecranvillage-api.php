@@ -33,10 +33,10 @@ class API {
 			'posts_per_page' => -1
 		);
 
-		$posts = get_posts( $args );
+		$posts = \get_posts( $args );
 
 		// if $data empty or wp_error then return error response with 404 status code
-		if ( empty( $posts ) || is_wp_error( $posts ) ) {
+		if ( empty( $posts ) || \is_wp_error( $posts ) ) {
 			return null; // new WP_REST_Response( array( ), 404 );
 		}
 
@@ -52,8 +52,8 @@ class API {
 
 	public static function download_response( $request )
 	{
-		$date = date("Ymd");
-		header('Content-Disposition: attachment; filename="export-'.$date.'.json"');
+		$date = \date("Ymd");
+		\header('Content-Disposition: attachment; filename="export-'.$date.'.json"');
 
 		return self::api_response( $request );
 	}
@@ -76,7 +76,7 @@ class API {
 		$postdata['description'] = \EcranVillage\Film::get_feed_meta( $item->ID, false );
 		//$postdata['description'] = strip_tags( apply_filters( 'get_the_excerpt', strip_shortcodes( $item->post_excerpt ) ) );
 
-		$postdata['affiche'] = get_the_post_thumbnail_url( $item->ID, 'full' );
+		$postdata['affiche'] = \get_the_post_thumbnail_url( $item->ID, 'full' );
 
 		return $postdata;
 	}

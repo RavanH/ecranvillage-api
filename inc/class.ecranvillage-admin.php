@@ -16,14 +16,14 @@ class Admin {
 		$tab = 'import';
 		$messages = array();
 
-		if ( ( ! empty( $_POST ) || isset( $_GET['_wpnonce'] ) ) && check_admin_referer('ecranvillage-settings') ) {
+		if ( ( ! empty( $_POST ) || isset( $_GET['_wpnonce'] ) ) && \check_admin_referer('ecranvillage-settings') ) {
 
 			if ( isset( $_POST['app_url'] ) || isset( $_POST['tmdb_api_key'] ) ) {
-				$url = !empty($_POST['app_url']) ? sanitize_option( 'siteurl', $_POST['app_url'] ) : '';
-				update_option( 'ecranvillage_app_url', $url );
+				$url = !empty($_POST['app_url']) ? \sanitize_option( 'siteurl', $_POST['app_url'] ) : '';
+				\update_option( 'ecranvillage_app_url', $url );
 
-				$key = !empty($_POST['tmdb_api_key']) ? sanitize_text_field( $_POST['tmdb_api_key'] ) : '';
-				update_option( 'ecranvillage_tmdb_api_key', $key );
+				$key = !empty($_POST['tmdb_api_key']) ? \sanitize_text_field( $_POST['tmdb_api_key'] ) : '';
+				\update_option( 'ecranvillage_tmdb_api_key', $key );
 
 				$tab = 'settings';
 				$messages[0] = __('Settings saved.');
@@ -36,21 +36,21 @@ class Admin {
 
 				switch ( $_GET['purge'] ) {
 					case 'films' :
-						if ( delete_transient( 'films' ) )
+						if ( \delete_transient( 'films' ) )
 							$messages[] = 'Le cache de films est vidé avec succès.';
 						else
 							$messages[] = 'Le cache de films était déjà vide.';
 					break;
 
 					case 'villages' :
-						if ( delete_transient( 'villages' ) )
+						if ( \delete_transient( 'villages' ) )
 							$messages[] = 'Le cache de villages est vidé avec succès.';
 						else
 							$messages[] = 'Le cache de villages était déjà vide.';
 					break;
 
 					case 'seances' :
-						$post_ids = get_posts( array(
+						$post_ids = \get_posts( array(
 								'numberposts'	=> -1, // get all posts.
 								'post_type'	=> 'film',
 								'tax_query'		=> array(
@@ -64,20 +64,20 @@ class Admin {
 							)
 						);
 						foreach ( $post_ids as $id ) {
-							if ( delete_transient( 'seances_'.$id ) ) $i++;
+							if ( \delete_transient( 'seances_'.$id ) ) $i++;
 						}
 						$messages[] = "Le cache de séances des films à l'affiche et à venir est vidé avec succès. Un total de $i réponses mises en cache sont trouvées et supprimées.";
 					break;
 
 					case 'seances-all' :
-						$post_ids = get_posts( array(
+						$post_ids = \get_posts( array(
 								'numberposts'	=> -1, // get all posts.
 								'post_type'	=> 'film',
 								'fields'		=> 'ids', // Only get post IDs
 							)
 						);
 						foreach ( $post_ids as $id ) {
-							if ( delete_transient( 'seances_'.$id ) ) $i++;
+							if ( \delete_transient( 'seances_'.$id ) ) $i++;
 						}
 						$messages[] = "Le cache de séances de tous les films est vidé avec succès. Un total de $i réponses mises en cache sont trouvées et supprimées.";
 					break;
@@ -89,8 +89,8 @@ class Admin {
 			}
 		}
 
-		$app_url = untrailingslashit( get_option( 'ecranvillage_app_url', '' ) );
-		$tmdb_api_key = get_option( 'ecranvillage_tmdb_api_key', '' );
+		$app_url = \untrailingslashit( \get_option( 'ecranvillage_app_url', '' ) );
+		$tmdb_api_key = \get_option( 'ecranvillage_tmdb_api_key', '' );
 
 		if ( empty($app_url) ) {
 			$tab = 'settings';

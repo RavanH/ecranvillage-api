@@ -18,37 +18,37 @@ class Shortcodes {
 	*************************/
 	public static function etoiles( $atts, $content = null )
 	{
-		extract( shortcode_atts( [
+		\extract( \shortcode_atts( [
 			'note' => '0',
 			'total' => '5',
 			'float' => '',
 			'display' => ''
 		], $atts, 'etoiles' ) );
 
-		$total = round( (float)$total );
+		$total = \round( (float)$total );
 		// see if $atts has a keyless value and parse that
 		if ( empty( (int)$note ) ) {
 			if ( !empty($atts[0]) ) {
-				$data = explode( '/', $atts[0] );
-				if ( !empty($data[0]) && is_numeric($data[0]) ) $note = (float)$data[0];
-				if ( !empty($data[1]) && is_numeric($data[1]) ) $total = (int)$data[1];
+				$data = \explode( '/', $atts[0] );
+				if ( !empty($data[0]) && \is_numeric($data[0]) ) $note = (float)$data[0];
+				if ( !empty($data[1]) && \is_numeric($data[1]) ) $total = (int)$data[1];
 			}
 		}
 
-		$note = (float) str_replace( ',', '.', $note );
+		$note = (float) \str_replace( ',', '.', $note );
 
 		// make sure $total is not 0 or below, default to 5
 		$total = $total > 0 ? $total : 5;
 
 		$val = (int)($note*10);
 
-		$style = ( in_array($display,array('block','inline','inline-block','none') ) ) ? 'display:' . $display . ';' : '';
-		$style.= ( in_array($float,array('left','right') ) ) ? 'float:' . $float . ';' : '';
+		$style = \in_array( $display, array('block','inline','inline-block','none') ) ? 'display:' . $display . ';' : '';
+		$style.= \in_array( $float, array('left','right') ) ? 'float:' . $float . ';' : '';
 		if ( !empty($style) ) $style = ' style="' . $style . '"';
 
 		// build output
 		if ( !empty($content) )
-		$output = '<blockquote'. ( is_singular('film') ? ' itemprop="review"' : '' ) .' itemscope itemtype="http://schema.org/Review">';
+		$output = '<blockquote'. ( \is_singular('film') ? ' itemprop="review"' : '' ) .' itemscope itemtype="http://schema.org/Review">';
 		else
 		$output = '';
 		$output .= '<span class="rating"' . $style . ' title="' . ($val/10) . ' sur ' . $total . ' étoiles" aria-label="' . ($val/10) . ' sur ' . $total . ' étoiles"' . ( !empty($content) ? ' itemprop="reviewRating"' : '' ) . ' itemscope itemtype="http://schema.org/Rating">';
@@ -77,25 +77,25 @@ class Shortcodes {
 	*****************************/
 	public static function applink( $atts, $content = null )
 	{
-		extract( shortcode_atts( [
+		\extract( \shortcode_atts( [
 			'title' => '',
 			'class' => '',
 			'target' => ''
 		], $atts, 'applink' ) );
 
-		$app_url = get_option( 'ecranvillage_app_url' );
+		$app_url = \get_option( 'ecranvillage_app_url' );
 
 		if ( empty( $content ) ) $content = $app_url;
 
-		$output = '<a href="' . esc_url($app_url) . '"';
+		$output = '<a href="' . \esc_url($app_url) . '"';
 		if ( !empty( $title ) ) {
-			$output .= ' title="' . esc_html($title) . '"';
+			$output .= ' title="' . \esc_html($title) . '"';
 		}
 		if ( !empty( $class ) ) {
-			$output .= ' class="' . esc_html($class) . '"';
+			$output .= ' class="' . \esc_html($class) . '"';
 		}
 		if ( !empty( $target ) ) {
-			$output .= ' target="' . esc_html($target) . '"';
+			$output .= ' target="' . \esc_html($target) . '"';
 		}
 		$output .= '>' . $content . '</a>';
 
@@ -109,8 +109,8 @@ class Shortcodes {
 	{
 		global $post;
 
-		extract( shortcode_atts( [
-			'id' => get_post_meta( $post->ID, 'film_id' , true),
+		\extract( \shortcode_atts( [
+			'id' => \get_post_meta( $post->ID, 'film_id' , true),
 			'title' => $post->post_title,
 			'align' => 'initial',
 			'format' => 'table'
@@ -121,11 +121,11 @@ class Shortcodes {
 		//delete_transient( 'seances_'.$post->ID );
 		//delete_transient( 'villages');
 
-		$app_url = get_option( 'ecranvillage_app_url' );
+		$app_url = \get_option( 'ecranvillage_app_url' );
 		if ( false === $app_url ) {
 			return self::none_found('missing App URL.');
 		}
-		$app_url = untrailingslashit( $app_url );
+		$app_url = \untrailingslashit( $app_url );
 
 		// determine the associated ID
 		if ( empty( $id ) || ! is_numeric( $id ) ) {
@@ -137,23 +137,23 @@ class Shortcodes {
 			}
 
 			foreach ( $films_json as $film ) {
-				if ( is_object($film) && $film->titrefilm == $title ) {
+				if ( \is_object($film) && $film->titrefilm == $title ) {
 					$id = $film->id;
 					break 1;
 				}
 			}
 
 			// no match found? abort mission
-			if ( empty( $id ) || !is_numeric( $id ) ) {
+			if ( empty( $id ) || ! \is_numeric( $id ) ) {
 				return self::none_found($title.' not found.', $format);
 			}
 
-			update_post_meta( $post->ID, 'film_id', $id );
+			\update_post_meta( $post->ID, 'film_id', $id );
 		}
 
 		// get seances json or abort mission
 		$seances_json = self::get_transient_or_remote( 'seances_'.$post->ID, 3600, $app_url.'/films/'.$id.'.json' );
-		if ( is_wp_error( $seances_json ) ) {
+		if ( \is_wp_error( $seances_json ) ) {
 			$error_message = $seances_json->get_error_message();
 			return self::none_found($error_message);
 		}
@@ -161,13 +161,13 @@ class Shortcodes {
 		// build villages array with ID and full name
 		$villages = array();
 		$villages_json = self::get_transient_or_remote( 'villages', 86400, $app_url.'/villages.json' );
-		if ( !is_wp_error( $villages_json ) ) {
+		if ( ! \is_wp_error( $villages_json ) ) {
 			foreach ( $villages_json as $village ) {
-				if ( !is_object($village) ) continue;
+				if ( ! \is_object($village) ) continue;
 
-				$village_id = property_exists($village, 'id') ? $village->id : 0;
-				$commune = property_exists($village, 'commune') ? $village->commune : '';
-				$salle = property_exists($village, 'salle') ? ', ' . $village->salle : '';
+				$village_id = \property_exists($village, 'id') ? $village->id : 0;
+				$commune = \property_exists($village, 'commune') ? $village->commune : '';
+				$salle = \property_exists($village, 'salle') ? ', ' . $village->salle : '';
 				$villages[$village_id] = $commune . $salle;
 			}
 		}
@@ -184,13 +184,13 @@ class Shortcodes {
 
 		// build our output from array
 		$output = '';
-		$now = time();
-		$logo = get_site_icon_url(); // integrate into theme... default logo in the dir
-		$image_src = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ) );
-		$image = is_array( $image_src ) ? '<meta itemprop="image" content="' . $image[0] . '">' : '';
+		$now = \time();
+		$logo = \get_site_icon_url(); // integrate into theme... default logo in the dir
+		$image_src = \wp_get_attachment_image_src( \get_post_thumbnail_id( $post->ID ) );
+		$image = \is_array( $image_src ) ? '<meta itemprop="image" content="' . $image[0] . '">' : '';
 
 		foreach ( $seances as $_village_id => $_seances ) {
-			$village = array_key_exists($_village_id, $villages) ? $villages[$_village_id] : '';
+			$village = \array_key_exists($_village_id, $villages) ? $villages[$_village_id] : '';
 
 			$header = ( 'simple' === $format )
 				? '<dt><strong>' . $village . '</strong></dt><dd><ul>'
@@ -215,9 +215,9 @@ class Shortcodes {
 					$class = ' class="soon"';
 				}
 
-				$datetime = date('c', $timestamp); // ISO 8601 date
-				$date = ('simple' === $format) ? ucfirst( wp_date( 'D. j M.', $timestamp ) ) : ucfirst( wp_date( get_option( 'date_format' ), $timestamp ) );
-				$heure = wp_date( get_option( 'time_format' ), $timestamp );
+				$datetime = \date('c', $timestamp); // ISO 8601 date
+				$date = ('simple' === $format) ? \ucfirst( \wp_date( 'D. j M.', $timestamp ) ) : \ucfirst( \wp_date( \get_option( 'date_format' ), $timestamp ) );
+				$heure = \wp_date( \get_option( 'time_format' ), $timestamp );
 				$version = isset($_data['version']) ? $_data['version'] : '';
 				$info = isset($_data['info']) ? $_data['info'] : '';
 
@@ -279,29 +279,35 @@ class Shortcodes {
 
 	private static function remote_get_json_decode( $url )
 	{
-		$response = wp_remote_get( $url, self::$timeout );
+		$response = \wp_remote_get( $url, self::$timeout );
 
-		if ( is_wp_error( $response ) ) {
+		if ( \is_wp_error( $response ) ) {
 			return $response;
 		}
 
-		$json = json_decode( $response['body'] );
+		$json = \json_decode( $response['body'] );
 
-		switch (json_last_error()) {
+		switch ( \json_last_error() ) {
 			case JSON_ERROR_NONE:
-			return $json;
+				return $json;
+
 			case JSON_ERROR_DEPTH:
-			return new WP_Error( 'json_error', 'Maximum stack depth exceeded in ' . $url );
+				return new WP_Error( 'json_error', 'Maximum stack depth exceeded in ' . $url );
+
 			case JSON_ERROR_STATE_MISMATCH:
-			return new WP_Error( 'json_error', 'Underflow or the modes mismatch in ' . $url );
+				return new WP_Error( 'json_error', 'Underflow or the modes mismatch in ' . $url );
+
 			case JSON_ERROR_CTRL_CHAR:
-			return new WP_Error( 'json_error', 'Unexpected control character found in ' . $url );
+				return new WP_Error( 'json_error', 'Unexpected control character found in ' . $url );
+
 			case JSON_ERROR_SYNTAX:
-			return new WP_Error( 'json_error', 'Syntax error, malformed JSON in ' . $url );
+				return new WP_Error( 'json_error', 'Syntax error, malformed JSON in ' . $url );
+
 			case JSON_ERROR_UTF8:
-			return new WP_Error( 'json_error', 'Malformed UTF-8 characters, possibly incorrectly encoded ' . $url );
+				return new WP_Error( 'json_error', 'Malformed UTF-8 characters, possibly incorrectly encoded ' . $url );
+
 			default:
-			return new WP_Error( 'json_error', 'Unknown error in ' . $url );
+				return new WP_Error( 'json_error', 'Unknown error in ' . $url );
 		}
 	}
 
@@ -323,13 +329,13 @@ class Shortcodes {
 		//$_wp_using_ext_object_cache_previous = $_wp_using_ext_object_cache;
 		//$_wp_using_ext_object_cache = false;
 
-		$json = get_transient( $transient );
+		$json = \get_transient( $transient );
 
 		if( false === $json && !empty($url) ) {
 			$json = self::remote_get_json_decode( $url );
 
-			if( !is_wp_error( $json ) ) {
-				set_transient( $transient, $json, $expiration );
+			if( ! \is_wp_error( $json ) ) {
+				\set_transient( $transient, $json, $expiration );
 			}
 		}
 
@@ -366,20 +372,20 @@ class Shortcodes {
 		// arrange seances per location id
 		$villages_seances = array();
 		foreach ( $json as $_seance ) {
-			if ( !is_object($_seance) ) continue;
+			if ( ! \is_object($_seance) ) continue;
 
-			if ( !isset($film_id) || ( property_exists($_seance, 'film_id') && $_seance->film_id == $film_id ) ) {
-				$village_id = property_exists($_seance, 'village_id') ? $_seance->village_id : 0;
-				if ( property_exists($_seance, 'horaire') ) {
-					$_timestamp = strtotime( $_seance->horaire );
+			if ( ! isset($film_id) || ( \property_exists($_seance, 'film_id') && $_seance->film_id == $film_id ) ) {
+				$village_id = \property_exists($_seance, 'village_id') ? $_seance->village_id : 0;
+				if ( \property_exists($_seance, 'horaire') ) {
+					$_timestamp = \strtotime( $_seance->horaire );
 					$timestamp = $_timestamp ? $_timestamp : $_seance->horaire;
 				} else {
 					$timestamp = 0;
 				}
 				$villages_seances[$village_id][$timestamp] = array(
-					'version' => property_exists($_seance, 'version') ? $_seance->version : '',
-					'info'  => property_exists($_seance, 'extras') ? $_seance->extras : '',
-					'annulee' => property_exists($_seance, 'annulee') ? $_seance->annulee : ''
+					'version' => \property_exists($_seance, 'version') ? $_seance->version : '',
+					'info'  => \property_exists($_seance, 'extras') ? $_seance->extras : '',
+					'annulee' => \property_exists($_seance, 'annulee') ? $_seance->annulee : ''
 				);
 			}
 		}
@@ -393,24 +399,24 @@ class Shortcodes {
 	/**
 	* Deep ksort for multidimensional arrays
 	*
-	* @author	 Kevin van Zonneveld &lt;kevin@vanzonneveld.net>
-	* @copyright 2008 Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-	* @license	http://www.opensource.org/licenses/bsd-license.php New BSD Licence
-	* @version	SVN: Release: $Id: ksortTree.inc.php 223 2009-01-25 13:35:12Z kevin $
-	* @link	  http://kevin.vanzonneveld.net/
+	* @author		Kevin van Zonneveld &lt;kevin@vanzonneveld.net>
+	* @copyright	2008 Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+	* @license		http://www.opensource.org/licenses/bsd-license.php New BSD Licence
+	* @version		SVN: Release: $Id: ksortTree.inc.php 223 2009-01-25 13:35:12Z kevin $
+	* @link			http://kevin.vanzonneveld.net/
 	*
 	* @param	array $array
-	* @return  true/false
+	* @return	true/false
 	*/
 
 	private static function ksort_deep( &$array )
 	{
-		if (!is_array($array)) {
+		if ( ! \is_array($array) ) {
 			return false;
 		}
 
-		ksort($array);
-		foreach ($array as $k=>$v) {
+		ksort( $array );
+		foreach ( $array as $k => $v ) {
 			self::ksort_deep($array[$k]);
 		}
 
