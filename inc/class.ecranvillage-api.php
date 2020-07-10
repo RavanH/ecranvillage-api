@@ -37,7 +37,7 @@ class API {
 
 		// if $data empty or wp_error then return error response with 404 status code
 		if ( empty( $posts ) || \is_wp_error( $posts ) ) {
-			return null; // new WP_REST_Response( array( ), 404 );
+			return null; // new \WP_REST_Response( array( ), 404 );
 		}
 
 		// foreach throught them to get relevant data and add these to response array
@@ -47,7 +47,7 @@ class API {
 		}
 
 		// return response array + status
-		return new WP_REST_Response( $data, 200 );
+		return new \WP_REST_Response( $data, 200 );
 	}
 
 	public static function download_response( $request )
