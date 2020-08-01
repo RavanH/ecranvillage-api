@@ -14,12 +14,13 @@ Film post type, JSON endpoint and seances shortcode for Plannings App Écran Vil
 
 == Upgrade Notice ==
 
-= 4.0.1 =
-Fix JSON Rest API bug
+= 4.0.2 =
+Fix JSON Rest API bug + missing permission_callback
 
 == Changelog ==
 
-= 4.0.1 =
+= 4.0.2 =
+* FIX: missing permission_callback in register_rest_route (WP v5.5 compat)
 * FIX: call WP_REST_Response in root namespace
 
 = 4.0 =
