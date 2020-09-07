@@ -23,16 +23,23 @@ a.nav-tab:focus { box-shadow: none }
 <?php if ( !empty($app_url) ) : ?>
 
 	<div id="import" class="tab">
-		<h2>Importer les nouveaux films dans l'application Plannings</h2>
+		<h2>Exporter les nouveaux films vers l'application Plannings</h2>
 		<p>Pour importer les nouveaux films dans l'application Plannings, il suffit d'aller sur cette page <a href="<?php echo $app_url . '/ecranvillage'; ?>" class="button" target="plannings">Import Plannings</a></p>
-		<p>Avec cette méthode, les films importés ont le même ID que leur page Wordpress et les liens marchent bien !</p>
 		<p>Cette façon de faire est la même si on clique sur le bouton 'Importer les nouveaux films' dans la page Films de l'application Plannings.</p>
-		<h2>Importer des anciens films</h2>
+		<h2>Exporter des anciens films</h2>
 		<p>Si c'est un film qui existait déjà dans les archives, il suffit de le remettre dans la catégorie 'à venir' ou provisoirement dans la catégorie 'export', puis de recommencer la procédure.</p>
 		<p>Vérifiez aussi si le film n'existe pas déjà dans l'application Plannings <a href="<?php echo $app_url . '/admin/film'; ?>" class="button" target="plannings">ici</a>. Si c'est le cas, cliquez sur 'Voir dans l'application' puis 'Modifier' et éditer les champs 'created_at' et 'updated_at' à la date d'aujourd'hui de façon à retrouver ensuite le film dans les films à venir et dans l'édition des séances.</p>
 		<h2>Gestion des séances</h2>
-		<p>Pour éditer les séances, tout ce passe dans la page <a href="<?php echo $app_url . '/films'; ?>" class="button" target="plannings">Films</a> de l'application</p>
-		<p>Ensuite pour relier les séances au vues du site Wordpress, suivez les indications du shortcode <strong>[seances]</strong> sous l'onglet Shortcodes.</p>
+		<p>Pour éditer les séances, tout ce passe dans la page <a href="<?php echo $app_url . '/films'; ?>" class="button" target="plannings">Films</a> de l'application. Puis, les seances doivent apparaître en bas des films automatiquement. Sinon, il y a un problème avec l'association entre l'article et la fiche du film dans l'application.</p>
+		<p><strong>Associer un article sur le site au bon film dans l'application manuellement:</strong>
+			<ul>
+				<li>- Ouvre la page <a href="<?php echo $app_url . '/admin/film'; ?>" target="plannings">Listing des Films</a> dans l'application Plannings et note le chiffre de l'<strong>Id</strong> du film souhaité.</li>
+				<li>- Reviens sur l'article WordPress pour modifier et trouve le bloc "Champs personnalisés" en dessous le bloc du texte principal. Si il n'y est pas visible, ouvre l'onglet "Options de l'écran" à droite en haut de la page et coche la case "Champs personnalisés."</li>
+				<li>- Dans le bloc "Champs personnalisés" sélectionne "film_id" sous "Nom" et entre le chiffre de l'Id du film souhaité sous "Valeur". Si il y a déjà un champ "film_id" existant, modifie ou supprime le. Il faut pas y avoir plusieurs champs avec le même nom "film_id".</li>
+			</ul>
+		</p>
+		<h2>Flux d'export manuelle</h2>
+		<p>Le flux JSON d'export peut être vu <a href="<?php echo get_home_url( null, '/wp-json/ecranvillage-api/v2/export' ); ?>" class="button" target="_blank">ici</a> ou téléchargé <a href="<?php echo get_home_url( null, '/wp-json/ecranvillage-api/v2/export/download' ); ?>" class="button">ici</a>.</p>
 	</div>
 
 	<div id="tools" class="tab">
@@ -64,7 +71,10 @@ a.nav-tab:focus { box-shadow: none }
 			</li>
 		</ul>
 		<p><strong>Réinitialiser les associtations des films : </strong></p>
-		<p>[prochainement]</p>
+		<p>
+			<a href="<?php print add_query_arg( 'purge', 'film-ids', $nonce_url ); ?>" class="button" onclick="javascript:return confirm('ATTENTION: Cette reinialisation remettra toutes associations manuelles à zéro au même temps que les associations automatiques! Êtes-vous sûr?')">Réinitialiser les IDs</a>
+			<span class="description">Les IDs des films liés entre l'applications et le site sont tous remis à zéro. Normalement, les associations sont recréées à partir des titres des films mais si il y a un ou plusieurs films qui ne sont pas bien liés, il faut une association manuelle. ATTENTION: Cette reinialisation remettra toutes associations manuelles à zéro au même temps que les associations automatiques!</span>
+		</p>
 	</div>
 
 <?php endif; ?>
@@ -115,17 +125,9 @@ a.nav-tab:focus { box-shadow: none }
 
 		<h2>[seances]</h2>
 		<p>Utilise le shortcode <strong>[seances /]</strong> dans les articles WordPress pour montrer un tableau des séances. Par défaut, le shortcode cherche le film du même titre. Il faut que les titres du film et de l'article correspondent exactement. Au cas où le bon film n'est pas trouvé automatiquement, il y a deux méthodes pour faire montrer les bonnes séances:</p>
-		<ol>
-			<li><strong>Associer l'article au bon film.</strong>
-				<ul>
-					<li>- Ouvre la page <a href="<?php echo $app_url . '/admin/film'; ?>" target="plannings">Listing des Films</a> dans l'application Plannings et note le chiffre de l'<strong>Id</strong> du film souhaité.</li>
-					<li>- Reviens sur l'article WordPress pour modifier et trouve le bloc "Champs personnalisés" en dessous le bloc du texte principal. Si il n'y est pas visible, ouvre l'onglet "Options de l'écran" à droite en haut de la page et coche la case "Champs personnalisés."</li>
-					<li>- Dans le bloc "Champs personnalisés" sélectionne "film_id" sous "Nom" et entre le chiffre de l'Id du film souhaité sous "Valeur". Si il y a déjà un champ "film_id" existant, modifie ou supprime le. Il faut pas y avoir plusieurs champs avec le même nom "film_id".</li>
-				</ul>
-			</li>
-			<li><strong>Associer le shortcode [seances] au bon film.</strong><br>
-				Ajoute au shortcode un des paramètres disponible pour forcer l'association à un film dans l'application de Plannings. Par exemple <strong>[seances id="1"]</strong> ou <strong>[seances titrefilm="COURT ECOLE ST JEAN"]</strong> montre les séances du film "COURT ECOLE ST JEAN" même si le titre je l'article ne corresponds pas au titre du film.</li>
-		</ol>
+		<p><strong>Associer le shortcode [seances] au bon film.</strong><br>
+			Ajoute au shortcode un des paramètres disponible pour forcer l'association à un film dans l'application de Plannings. Par exemple <strong>[seances id="1"]</strong> ou <strong>[seances titrefilm="COURT ECOLE ST JEAN"]</strong> montre les séances du film "COURT ECOLE ST JEAN" même si le titre je l'article ne corresponds pas au titre du film.</li>
+		</p>
 		<h3>Paramètres</h3>
 		<dl>
 			<dt><strong>id</strong></dt>

@@ -66,7 +66,7 @@ class Admin {
 						foreach ( $post_ids as $id ) {
 							if ( \delete_transient( 'seances_'.$id ) ) $i++;
 						}
-						$messages[] = "Le cache de séances des films à l'affiche et à venir est vidé avec succès. Un total de $i réponses mises en cache sont trouvées et supprimées.";
+						$messages[] = "Le cache de séances des films à l'affiche et à venir a été vidé avec succès. Un total de $i réponses mises en cache sont supprimées.";
 					break;
 
 					case 'seances-all' :
@@ -79,7 +79,14 @@ class Admin {
 						foreach ( $post_ids as $id ) {
 							if ( \delete_transient( 'seances_'.$id ) ) $i++;
 						}
-						$messages[] = "Le cache de séances de tous les films est vidé avec succès. Un total de $i réponses mises en cache sont trouvées et supprimées.";
+						$messages[] = "Le cache de séances de tous les films a été vidé avec succès. Un total de $i réponses mises en cache sont supprimées.";
+					break;
+
+					case 'film-ids' :
+						global $wpdb;
+						// images meta
+						$i = $wpdb->delete( $wpdb->prefix.'postmeta', array( 'meta_key' => 'film_id' ) );
+						$messages[] = "Les associations des films par ID ont été remis à zéro avec succès. Un total de $i IDs sont supprimées.";
 					break;
 				}
 				// But guess what? Sometimes transients are not in the DB but in a persistent object cache, so we have to do this too:
