@@ -1,9 +1,9 @@
 === Écran Village ===
 Contributors: RavanH
 Tags: custom post type, film, shortcodes
-Stable tag: 4.0.2
+Stable tag: 4.0.3
 Requires at least: 3.6
-Tested up to: 4.9
+Tested up to: 5.5
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -11,13 +11,18 @@ Film post type, JSON endpoint and seances shortcode for Plannings App Écran Vil
 
 == Description ==
 
+Film post type, JSON endpoint and seances shortcode to work in conjuntion with the Plannings App "Écran Village".
+
 
 == Upgrade Notice ==
 
-= 4.0.2 =
-Fix JSON Rest API bug + missing permission_callback
+= 4.0.3 =
+Fix incorrect seances dates
 
 == Changelog ==
+
+= 4.0.3 =
+* FIX: Fix incorrect seances dates
 
 = 4.0.2 =
 * FIX: missing permission_callback in register_rest_route (WP v5.5 compat)

@@ -376,9 +376,8 @@ class Shortcodes {
 
 			if ( ! isset($film_id) || ( \property_exists($_seance, 'film_id') && $_seance->film_id == $film_id ) ) {
 				$village_id = \property_exists($_seance, 'village_id') ? $_seance->village_id : 0;
-				if ( \property_exists($_seance, 'horaire') ) {
-					$_timestamp = \strtotime( $_seance->horaire );
-					$timestamp = $_timestamp ? $_timestamp : $_seance->horaire;
+				if ( \property_exists($_seance, 'horaire') && ! empty( $_seance->horaire ) ) {
+					$timestamp = \ctype_digit( $_seance->horaire ) ? $_seance->horaire : \strtotime( $_seance->horaire );
 				} else {
 					$timestamp = 0;
 				}
