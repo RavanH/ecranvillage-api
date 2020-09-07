@@ -175,11 +175,34 @@ class Shortcodes {
 		// set locale for timestamp date conversion in strftime()
 		//setlocale(LC_TIME, get_locale().'.UTF8');
 
-		// prepare the seances array
-		$seances = self::prepare_seances( $seances_json, $id );
+		// arrange seances per location id
+		$villages_seances = array();
+		foreach ( $seances_json as $_seance ) {
+			if ( ! \is_object($_seance) ) continue;
 
-		if ( !$seances ) {
+			if ( ! isset($film_id) || ( \property_exists($_seance, 'film_id') && $_seance->film_id == $film_id ) ) {
+				$village_id = \property_exists($_seance, 'village_id') ? $_seance->village_id : 0;
+				if ( \property_exists($_seance, 'horaire') && ! empty( $_seance->horaire ) ) {
+					$timestamp = \ctype_digit( $_seance->horaire ) ? $_seance->horaire : \strtotime( $_seance->horaire );
+				} else {
+					$timestamp = 0;
+				}
+				$villages_seances[$village_id][$timestamp] = array(
+					'version' => \property_exists($_seance, 'version') ? $_seance->version : '',
+					'info'  => \property_exists($_seance, 'extras') ? $_seance->extras : '',
+					'annulee' => \property_exists($_seance, 'annulee') ? $_seance->annulee : ''
+				);
+			}
+		}
+
+		// test for empty response
+		if ( ! $villages_seances ) {
 			return self::none_found('Empty response.', $format);
+		}
+
+		// do deep sorting and test for failed sorting
+		if ( ! self::ksort_deep( $villages_seances ) ) {
+			return self::none_found('Unexpected response.', $format);
 		}
 
 		// build our output from array
@@ -189,7 +212,7 @@ class Shortcodes {
 		$image_src = \wp_get_attachment_image_src( \get_post_thumbnail_id( $post->ID ) );
 		$image = \is_array( $image_src ) ? '<meta itemprop="image" content="' . $image[0] . '">' : '';
 
-		foreach ( $seances as $_village_id => $_seances ) {
+		foreach ( $villages_seances as $_village_id => $_seances ) {
 			$village = \array_key_exists($_village_id, $villages) ? $villages[$_village_id] : '';
 
 			$header = ( 'simple' === $format )
@@ -265,7 +288,7 @@ class Shortcodes {
 
 	private static function none_found( $msg, $format = '' )
 	{
-		return ( 'simple' === $format ) ? '' : '<p class="seances-none-found"><em>Aucune séance trouvée.</em></p><!-- Error: '.$msg.' -->';
+		return ( 'simple' === $format ) ? '<!-- Error: '.$msg.' -->' : '<p class="seances-none-found"><em>Aucune séance trouvée.</em></p><!-- Error: '.$msg.' -->';
 	}
 
 	/**
@@ -331,7 +354,7 @@ class Shortcodes {
 
 		$json = \get_transient( $transient );
 
-		if( false === $json && !empty($url) ) {
+		if ( false === $json && !empty($url) ) {
 			$json = self::remote_get_json_decode( $url );
 
 			if( ! \is_wp_error( $json ) ) {
@@ -343,56 +366,6 @@ class Shortcodes {
 		//$_wp_using_ext_object_cache = $_wp_using_ext_object_cache_previous;
 
 		return $json;
-	}
-
-	/**
-	* Prepare the seances json response object array for parsing.
-	* The objects are grouped by location, turned into arrays and sorted by date.
-	*
-	* @param array/obj $json
-	* @return array
-	*/
-
-	private static function prepare_seances( $json, $film_id = null )
-	{
-		// set timezone for date to UNIX time conversion
-		/*$current_offset = get_option('gmt_offset');
-		$tzstring = get_option('timezone_string');
-		if ( empty($tzstring) ) { // Create a UTC+- zone if no timezone string exists
-			if (0 == $current_offset) {
-				$tzstring = 'UTC';
-			} elseif ($current_offset < 0) {
-				$tzstring = 'UTC' . $current_offset;
-			} else {
-				$tzstring = 'UTC+' . $current_offset;
-			}
-		}
-		date_default_timezone_set($tzstring);*/
-
-		// arrange seances per location id
-		$villages_seances = array();
-		foreach ( $json as $_seance ) {
-			if ( ! \is_object($_seance) ) continue;
-
-			if ( ! isset($film_id) || ( \property_exists($_seance, 'film_id') && $_seance->film_id == $film_id ) ) {
-				$village_id = \property_exists($_seance, 'village_id') ? $_seance->village_id : 0;
-				if ( \property_exists($_seance, 'horaire') && ! empty( $_seance->horaire ) ) {
-					$timestamp = \ctype_digit( $_seance->horaire ) ? $_seance->horaire : \strtotime( $_seance->horaire );
-				} else {
-					$timestamp = 0;
-				}
-				$villages_seances[$village_id][$timestamp] = array(
-					'version' => \property_exists($_seance, 'version') ? $_seance->version : '',
-					'info'  => \property_exists($_seance, 'extras') ? $_seance->extras : '',
-					'annulee' => \property_exists($_seance, 'annulee') ? $_seance->annulee : ''
-				);
-			}
-		}
-
-		// sorting
-		self::ksort_deep($villages_seances);
-
-		return $villages_seances;
 	}
 
 	/**
