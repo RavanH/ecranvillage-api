@@ -95,7 +95,7 @@ add_action( 'init', function() {
 add_action( 'rest_api_init', function () {
 	register_rest_route( 'ecranvillage-api/v2', '/export', array(
 		'methods' => 'GET',
-		'callback' => array('\EcranVillage\API','api_response'),
+		'callback' => array('\EcranVillage\API','response'),
 		'permission_callback' => '__return_true'
 	) );
 	register_rest_route( 'ecranvillage-api/v2', '/export/download', array(

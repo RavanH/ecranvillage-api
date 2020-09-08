@@ -368,9 +368,9 @@ class Film {
 
 		if ( $post->post_type !== 'film' ||
 			 ! isset( $_POST['film_meta_nonce'] ) ||
-			 ! \wp_verify_nonce( $_POST['film_meta_nonce'], 'save_film_meta-' . $post->ID ) ||
-			 ! \current_user_can( 'edit_post', $post->ID ) ) {
-			return $post->ID;
+			 ! \wp_verify_nonce( $_POST['film_meta_nonce'], 'save_film_meta-' . $post_id ) ||
+			 ! \current_user_can( 'edit_post', $post_id ) ) {
+			return;
 		}
 
 		$film_post_meta['trailer'] = isset($_POST['trailer']) ? \esc_url_raw( trim($_POST['trailer']) ) : '';
@@ -380,18 +380,30 @@ class Film {
 		$film_post_meta['info3'] = isset($_POST['info3']) ? \sanitize_text_field( $_POST['info3'] ) : '';
 		$film_post_meta['film_id'] = isset($_POST['film_id']) ? (int)$_POST['film_id'] : '';
 
+		// post treatment and verification meta data
+
+		// film ID
+		if ( empty( $film_post_meta['film_id'] ) ) {
+			$id = \EcranVillage\API::get_film_id( $post->post_title, $post->ID );
+			if ( ! \is_wp_error( $id ) )
+				$film_post_meta['film_id'] = $id;
+		}
+
+		// allocine URL
 		if ( isset($_POST['allocine']) ) {
-			$film_post_meta['allocine'] = ( \is_numeric( $_POST['allocine'] ) ) ? 'http://www.allocine.fr/film/fichefilm_gen_cfilm=' . $_POST['allocine'] . '.html' : \esc_url_raw( $_POST['allocine'] );
+			$film_post_meta['allocine'] = ( \ctype_digit( $_POST['allocine'] ) ) ? 'http://www.allocine.fr/film/fichefilm_gen_cfilm=' . $_POST['allocine'] . '.html' : \esc_url_raw( $_POST['allocine'] );
 		} else {
 			$film_post_meta['allocine'] = '';
 		}
 
+		// tmdb URL
 		if ( isset($_POST['tmdb']) ) {
-			$film_post_meta['tmdb'] = ( \is_numeric( $_POST['tmdb'] ) ) ? 'https://www.themoviedb.org/movie/' . $_POST['tmdb'] : \esc_url_raw( $_POST['tmdb'] );
+			$film_post_meta['tmdb'] = ( \ctype_digit( $_POST['tmdb'] ) ) ? 'https://www.themoviedb.org/movie/' . $_POST['tmdb'] : \esc_url_raw( $_POST['tmdb'] );
 		} else {
 			$film_post_meta['tmdb'] = '';
 		}
 
+		// imdb URL
 		if ( isset($_POST['imdb']) ) {
 			$film_post_meta['imdb'] = ( 0 === \strpos( $_POST['imdb'], 'tt') || is_numeric( $_POST['imdb'] ) ) ? 'https://www.imdb.com/title/' . $_POST['imdb'] . '/' : \esc_url_raw( $_POST['imdb'] );
 		} else {
@@ -400,7 +412,7 @@ class Film {
 
 		// add values as custom fields
 		foreach( $film_post_meta as $key => $value ) { // cycle through the $quote_post_meta array
-			if ( !$value ) { // delete if blank
+			if ( ! $value ) { // delete if blank
 				\delete_post_meta( $post->ID, $key );
 			} else {
 				\update_post_meta($post->ID, $key, $value);

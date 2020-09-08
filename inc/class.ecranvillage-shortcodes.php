@@ -11,8 +11,6 @@ namespace EcranVillage;
 
 class Shortcodes {
 
-	private static $timeout = 3;
-
 	/*************************
 	* STAR RATINGS SHORTCODE
 	*************************/
@@ -122,45 +120,39 @@ class Shortcodes {
 		//delete_transient( 'villages');
 
 		$app_url = \get_option( 'ecranvillage_app_url' );
-		if ( false === $app_url ) {
-			return self::none_found('missing App URL.');
-		}
-		$app_url = \untrailingslashit( $app_url );
+
+		if ( empty( $app_url ) ) return self::none_found( 'Missing App URL.', $format );
+
+		$app_url = \trailingslashit( $app_url );
 
 		// determine the associated ID
-		if ( empty( $id ) || ! is_numeric( $id ) ) {
-			// get films json or abort mission
-			$films_json = self::get_transient_or_remote( 'films', 600, $app_url.'/tous_les_films.json' ); // films_a_venir.json == films modified last 2 months
-			if( is_wp_error( $films_json ) ) {
-				$error_message = $films_json->get_error_message();
-				return self::none_found($error_message);
+		if ( empty( $id ) || ! \ctype_digit( $id ) ) {
+			// get film id or wp_error
+			$id = \EcranVillage\API::get_film_id( $title, $post->ID );
+
+			// got error? abort mission.
+			if ( \is_wp_error( $id ) ) {
+				return self::none_found( $id->get_error_message(), $format );
 			}
 
-			foreach ( $films_json as $film ) {
-				if ( \is_object($film) && $film->titrefilm == $title ) {
-					$id = $film->id;
-					break 1;
-				}
+			// no ID found? abort mission.
+			if ( ! \ctype_digit( $id ) ) {
+				return self::none_found( 'Unexpected ID format.', $format );
 			}
 
-			// no match found? abort mission
-			if ( empty( $id ) || ! \is_numeric( $id ) ) {
-				return self::none_found($title.' not found.', $format);
-			}
-
+			// set found id as post meta
 			\update_post_meta( $post->ID, 'film_id', $id );
 		}
 
 		// get seances json or abort mission
-		$seances_json = self::get_transient_or_remote( 'seances_'.$post->ID, 3600, $app_url.'/films/'.$id.'.json' );
+		$seances_json = \EcranVillage\API::get_transient_or_remote( 'seances_'.$post->ID, 3600, $app_url.'films/'.$id.'.json' );
 		if ( \is_wp_error( $seances_json ) ) {
-			$error_message = $seances_json->get_error_message();
-			return self::none_found($error_message);
+			return self::none_found( $seances_json->get_error_message(), $format );
 		}
 
 		// build villages array with ID and full name
 		$villages = array();
-		$villages_json = self::get_transient_or_remote( 'villages', 86400, $app_url.'/villages.json' );
+		$villages_json = \EcranVillage\API::get_transient_or_remote( 'villages', 86400, $app_url.'villages.json' );
 		if ( ! \is_wp_error( $villages_json ) ) {
 			foreach ( $villages_json as $village ) {
 				if ( ! \is_object($village) ) continue;
@@ -289,83 +281,6 @@ class Shortcodes {
 	private static function none_found( $msg, $format = '' )
 	{
 		return ( 'simple' === $format ) ? '<!-- Error: '.$msg.' -->' : '<p class="seances-none-found"><em>Aucune séance trouvée.</em></p><!-- Error: '.$msg.' -->';
-	}
-
-	/**
-	* Get remote JSON and decode.
-	*
-	* Always returns a WP_Error object or a decoded JSON array of objects.
-	*
-	* @param string $url, self::$timeout
-	* @return array\obj JSON\WP_Error
-	*/
-
-	private static function remote_get_json_decode( $url )
-	{
-		$response = \wp_remote_get( $url, self::$timeout );
-
-		if ( \is_wp_error( $response ) ) {
-			return $response;
-		}
-
-		$json = \json_decode( $response['body'] );
-
-		switch ( \json_last_error() ) {
-			case JSON_ERROR_NONE:
-				return $json;
-
-			case JSON_ERROR_DEPTH:
-				return new WP_Error( 'json_error', 'Maximum stack depth exceeded in ' . $url );
-
-			case JSON_ERROR_STATE_MISMATCH:
-				return new WP_Error( 'json_error', 'Underflow or the modes mismatch in ' . $url );
-
-			case JSON_ERROR_CTRL_CHAR:
-				return new WP_Error( 'json_error', 'Unexpected control character found in ' . $url );
-
-			case JSON_ERROR_SYNTAX:
-				return new WP_Error( 'json_error', 'Syntax error, malformed JSON in ' . $url );
-
-			case JSON_ERROR_UTF8:
-				return new WP_Error( 'json_error', 'Malformed UTF-8 characters, possibly incorrectly encoded ' . $url );
-
-			default:
-				return new WP_Error( 'json_error', 'Unknown error in ' . $url );
-		}
-	}
-
-	/**
-	* Get object from transient or from remote JSON
-	*
-	* @param string $transient (required), int $exiration, string $url
-	* @return array\obj JSON\WP_Error
-	*/
-
-	private static function get_transient_or_remote( $transient, $expiration = 0, $url = '' )
-	{
-		// W3TC: Do we need to turn off the object cache temporarily while we deal with
-		// transients, as the W3 Total Cache conflicts with our work if transient
-		// expiration is longer than the object cache expiration?
-		// TODO: Test this theory or ask Frediric Townes...
-
-		//global $_wp_using_ext_object_cache;
-		//$_wp_using_ext_object_cache_previous = $_wp_using_ext_object_cache;
-		//$_wp_using_ext_object_cache = false;
-
-		$json = \get_transient( $transient );
-
-		if ( false === $json && !empty($url) ) {
-			$json = self::remote_get_json_decode( $url );
-
-			if( ! \is_wp_error( $json ) ) {
-				\set_transient( $transient, $json, $expiration );
-			}
-		}
-
-		// return object caching to its previous state
-		//$_wp_using_ext_object_cache = $_wp_using_ext_object_cache_previous;
-
-		return $json;
 	}
 
 	/**
