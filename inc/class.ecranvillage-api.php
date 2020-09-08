@@ -179,7 +179,7 @@ class API {
 	* @return array\obj JSON\WP_Error
 	*/
 
-	private static function get_transient_or_remote( $transient, $expiration = 0, $url = '' )
+	public static function get_transient_or_remote( $transient, $expiration = 0, $url = '' )
 	{
 		// W3TC: Do we need to turn off the object cache temporarily while we deal with
 		// transients, as the W3 Total Cache conflicts with our work if transient
