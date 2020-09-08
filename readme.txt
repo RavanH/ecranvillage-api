@@ -17,11 +17,12 @@ Film post type, JSON endpoint and seances shortcode to work in conjuntion with t
 == Upgrade Notice ==
 
 = 4.1.0 =
-Fix incorrect seances dates
+Fix incorrect seances dates and fetch film ID on post save
 
 == Changelog ==
 
 = 4.1.0 =
+* Fetch film ID on post save.
 * NEW: Tool to clear all film ID associations from database.
 
 = 4.0.3 =
