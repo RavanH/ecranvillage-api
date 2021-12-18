@@ -181,18 +181,22 @@ class API {
 
 	public static function get_transient_or_remote( $transient, $expiration = 0, $url = '' )
 	{
+		if ( empty( $url ) ) { 
+			return false;
+		}
+		
 		// W3TC: Do we need to turn off the object cache temporarily while we deal with
 		// transients, as the W3 Total Cache conflicts with our work if transient
 		// expiration is longer than the object cache expiration?
 		// TODO: Test this theory or ask Frediric Townes...
 
-		//global $_wp_using_ext_object_cache;
-		//$_wp_using_ext_object_cache_previous = $_wp_using_ext_object_cache;
-		//$_wp_using_ext_object_cache = false;
+		global $_wp_using_ext_object_cache;
+		$_wp_using_ext_object_cache_previous = $_wp_using_ext_object_cache;
+		$_wp_using_ext_object_cache = false;
 
 		$json = \get_transient( $transient );
 
-		if ( false === $json && ! empty( $url ) ) {
+		if ( false === $json ) {
 			$json = self::remote_get_json_decode( $url );
 
 			if( ! \is_wp_error( $json ) ) {
@@ -201,7 +205,7 @@ class API {
 		}
 
 		// return object caching to its previous state
-		//$_wp_using_ext_object_cache = $_wp_using_ext_object_cache_previous;
+		$_wp_using_ext_object_cache = $_wp_using_ext_object_cache_previous;
 
 		return $json;
 	}

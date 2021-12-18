@@ -202,7 +202,7 @@ class Shortcodes {
 		$now = \time();
 		$logo = \get_site_icon_url(); // integrate into theme... default logo in the dir
 		$image_src = \wp_get_attachment_image_src( \get_post_thumbnail_id( $post->ID ) );
-		$image = \is_array( $image_src ) ? '<meta itemprop="image" content="' . $image[0] . '">' : '';
+		$image = \is_array( $image_src ) ? '<meta itemprop="image" content="' . $image_src[0] . '">' : '';
 
 		foreach ( $villages_seances as $_village_id => $_seances ) {
 			$village = \array_key_exists($_village_id, $villages) ? $villages[$_village_id] : '';
