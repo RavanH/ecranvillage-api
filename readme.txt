@@ -21,6 +21,9 @@ Fix missing itemprop image
 
 == Changelog ==
 
+= 4.2 =
+* Remove Synopsis header from film template
+
 = 4.1.1 =
 * FIX: missing itemprop image
 

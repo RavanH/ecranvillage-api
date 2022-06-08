@@ -50,32 +50,31 @@ class Film {
 						//'value' => 'Bloc de critique à copier ou supprimer. Le shortcode [etoiles X] dont le X devrait être un chiffre entre 0 et 5, est dispo pour générer une image d\'étoiles.',
 						//'citation' => 'Source...'
 					) ),
-					array( 'core/heading', array(
-						'content' => 'Synopsis',
-					) ),
+					//array( 'core/heading', array(
+					//	'content' => 'Synopsis',
+					//) ),
 					array( 'core/paragraph', array(
-						'placeholder' => 'Ajout de synopsis en quelques paragraphes...',
+						'placeholder' => 'Ajout de synopsis en quelques paragraphes...'
 					) ),
 					array( 'core/gallery', array(
 						'columns' => 3,
 						'linkTo' => 'media'
 					) ),
 					array( 'core/heading', array(
-						'content' => 'Précédé du court métrage&nbsp;: TITRE...',
-						'level' => '3'
+						'content' => 'Précédé du court métrage&nbsp;: TITRE...'
 					) ),
 					array( 'core/gallery', array(
 						'columns' => 1,
 						'align' => 'left',
 						'linkTo' => 'media'
 					) ),
-	/*				array( 'core/image', array(
-						'align' => 'left',
-						'width' => 300,
-						'linkTo' => 'media'
-					) ),*/
+					//array( 'core/image', array(
+					//	'align' => 'left',
+					//	'width' => 300,
+					//	'linkTo' => 'media'
+					//) ),
 					array( 'core/paragraph', array(
-						'placeholder' => 'Ajout de synopsis ou supprime ces blocs du court métrage...',
+						'placeholder' => 'Ajout de synopsis ou supprime ces blocs du court métrage...'
 					) )
 				)
 			)
