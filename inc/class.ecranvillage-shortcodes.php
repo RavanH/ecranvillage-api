@@ -211,7 +211,7 @@ class Shortcodes {
 			$header = ( 'simple' === $format )
 				? '<dt><strong>' . $village . '</strong></dt><dd><ul>'
 				: '<table class="seances"><caption><strong>' . $village . '</strong></caption><thead>'
-					. '<tr><th>Date</th><th>Heure</th><th>Version</th><th>Audio-Description</th><th>Info</th></tr></thead><tbody>';
+					. '<tr><th>Date</th><th>Heure</th><th>Version</th><th>Info</th></tr></thead><tbody>';
 
 			$location = '<span itemprop="location" itemscope itemtype="http://schema.org/MovieTheater">'
 				. '<meta itemprop="name" content="Écran Village"><meta itemprop="image" content="' . $logo . '">'
@@ -234,9 +234,14 @@ class Shortcodes {
 				$datetime = \date('c', $timestamp); // ISO 8601 date
 				$date = ('simple' === $format) ? \ucfirst( \wp_date( 'D. j M.', $timestamp ) ) : \ucfirst( \wp_date( \get_option( 'date_format' ), $timestamp ) );
 				$heure = \wp_date( \get_option( 'time_format' ), $timestamp );
-				$version = isset($_data['version']) ? $_data['version'] : '';
-				$audio_description = isset($_data['audio_description']) ? $_data['audio_description'] : '';
 				$info = isset($_data['info']) ? $_data['info'] : '';
+				$version_data = array();
+				if ( !empty($_data['version']) ) {
+					$version_data[] = $_data['version'];
+				}
+				if ( !empty($_data['audio_description']) ) {
+					$version_data[] = $_data['audio_description'];
+				}
 
 				// add del tags if cancelled
 				if ( !empty($_data['annulee']) ) {
@@ -251,13 +256,13 @@ class Shortcodes {
 				 	? '<li itemscope itemtype="http://schema.org/ScreeningEvent"><meta itemprop="name" content="'
 						. $title . '">' . $image . '<meta itemprop="startDate" content="' . $datetime . '">'
 						. $location
-						. ( !empty($info) ? '<em>' . $info . '</em> : ' : '' ) . $date . ' ' . $heure . ( !empty($version) ? ' (<span itemprop="videoFormat">'
-						. $version . '</span>)' : '' )
+						. ( !empty($info) ? '<em>' . $info . '</em> : ' : '' ) . $date . ' ' . $heure . ( !empty($version_data) ? ' ( <span itemprop="videoFormat">'
+						. implode( ', ', $version_data ) . '</span> )' : '' )
 					: '<tr' . $class . ' itemscope itemtype="http://schema.org/ScreeningEvent">'
 						. '<td><meta itemprop="name" content="' . $title . '">' . $image . $date . '</td>'
 						. '<td itemprop="startDate" content="' . $datetime . '">' . $heure . '</td>'
-						. '<td itemprop="videoFormat">' . $version . '</td>' .'<td><meta itemprop="name" content="' . $audio_description . '">' . '<td class="extra">' . $info
-						. $location . '</td></tr>';
+						. '<td itemprop="videoFormat">' . implode( ', ', $version_data ) . '</td>'
+						. '<td class="extra">' . $info . $location . '</td></tr>';
 			}
 
 			if ( empty($rows) )
