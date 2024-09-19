@@ -181,6 +181,7 @@ class Shortcodes {
 				}
 				$villages_seances[$village_id][$timestamp] = array(
 					'version' => \property_exists($_seance, 'version') ? $_seance->version : '',
+					'audio_description' => \property_exists($_seance, 'audio_description') ? $_seance->audio_description : '',
 					'info'  => \property_exists($_seance, 'extras') ? $_seance->extras : '',
 					'annulee' => \property_exists($_seance, 'annulee') ? $_seance->annulee : ''
 				);
@@ -210,7 +211,7 @@ class Shortcodes {
 			$header = ( 'simple' === $format )
 				? '<dt><strong>' . $village . '</strong></dt><dd><ul>'
 				: '<table class="seances"><caption><strong>' . $village . '</strong></caption><thead>'
-					. '<tr><th>Date</th><th>Heure</th><th>Version</th><th>Info</th></tr></thead><tbody>';
+					. '<tr><th>Date</th><th>Heure</th><th>Version</th><th>Audio-Description</th><th>Info</th></tr></thead><tbody>';
 
 			$location = '<span itemprop="location" itemscope itemtype="http://schema.org/MovieTheater">'
 				. '<meta itemprop="name" content="Écran Village"><meta itemprop="image" content="' . $logo . '">'
@@ -234,6 +235,7 @@ class Shortcodes {
 				$date = ('simple' === $format) ? \ucfirst( \wp_date( 'D. j M.', $timestamp ) ) : \ucfirst( \wp_date( \get_option( 'date_format' ), $timestamp ) );
 				$heure = \wp_date( \get_option( 'time_format' ), $timestamp );
 				$version = isset($_data['version']) ? $_data['version'] : '';
+				$audio_description = isset($_data['audio_description']) ? $_data['audio_description'] : '';
 				$info = isset($_data['info']) ? $_data['info'] : '';
 
 				// add del tags if cancelled
@@ -241,6 +243,7 @@ class Shortcodes {
 					$date = '<del>' . $date . '</del>';
 					$heure = '<del>' . $heure . '</del>';
 					$version = '';
+					$audio_description = '':
 					$info = ( 'simple' === $format ) ? '' : 'Annulée';
 				}
 
@@ -253,7 +256,7 @@ class Shortcodes {
 					: '<tr' . $class . ' itemscope itemtype="http://schema.org/ScreeningEvent">'
 						. '<td><meta itemprop="name" content="' . $title . '">' . $image . $date . '</td>'
 						. '<td itemprop="startDate" content="' . $datetime . '">' . $heure . '</td>'
-						. '<td itemprop="videoFormat">' . $version . '</td>' . '<td class="extra">' . $info
+						. '<td itemprop="videoFormat">' . $version . '</td>' .'<td><meta itemprop="name" content="' . $audio_description . '">' . '<td class="extra">' . $info
 						. $location . '</td></tr>';
 			}
 
