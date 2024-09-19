@@ -3,7 +3,7 @@
  * Plugin Name: Écran Village
  * Plugin URI:
  * Description: Films post type, JSON endpoint and seances shortcode for Plannings App Écran Village
- * Version: 4.1.1
+ * Version: 4.2
  * Author: RavanH
  * Author URI: http://status301.net/
  * License: GPLv3
