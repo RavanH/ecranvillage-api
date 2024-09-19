@@ -1,7 +1,7 @@
 === Écran Village ===
 Contributors: RavanH
 Tags: custom post type, film, shortcodes
-Stable tag: 4.1.1
+Stable tag: 4.2
 Requires at least: 4.4
 Tested up to: 5.5
 License: GPLv3 or later
@@ -16,13 +16,14 @@ Film post type, JSON endpoint and seances shortcode to work in conjuntion with t
 
 == Upgrade Notice ==
 
-= 4.1.1 =
-Fix missing itemprop image
+= 4.2 =
+Updated Film template + Audidescription
 
 == Changelog ==
 
 = 4.2 =
 * Remove Synopsis header from film template
+* Add Audiodescription to API
 
 = 4.1.1 =
 * FIX: missing itemprop image
