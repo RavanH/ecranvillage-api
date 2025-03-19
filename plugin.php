@@ -1,12 +1,14 @@
 <?php
-/*
+/**
  * Plugin Name: Écran Village
  * Plugin URI:
  * Description: Films post type, JSON endpoint and seances shortcode for Plannings App Écran Village
- * Version: 4.2
+ * Version: 4.2.1
  * Author: RavanH
  * Author URI: http://status301.net/
  * License: GPLv3
+ *
+ * @package Écran Village API
  */
 
 /*
@@ -37,25 +39,28 @@ TODO
 */
 
 // Exit if accessed directly.
-defined( 'ABSPATH' ) ||	exit;
+defined( 'ABSPATH' ) || exit;
 
-define( 'ECRANVILLAGE_DIR', dirname(__FILE__) );
+define( 'ECRANVILLAGE_DIR', __DIR__ );
 
 /**
  * AUTOLOADER
  */
 
 spl_autoload_register(
-	function ( $class ) {
-		// bail if not inside EcranVillage namespace or class already exists
-		if ( 0 !== strpos( $class, 'EcranVillage\\' ) || class_exists( $class ) ) return;
-		// construct file name
-		$parts = explode( '\\', $class );
-		$class = implode( '-', array_filter( $parts ) );
-		$file = ECRANVILLAGE_DIR . '/inc/class.' . \strtolower( $class ) . '.php';
-		// include file if it exists
-		//if ( file_exists( $file ) )
-		include $file;
+	function ( $class_name ) {
+		// Bail out if not inside EcranVillage namespace or class already exists.
+		if ( 0 !== strpos( $class_name, 'EcranVillage\\' ) || class_exists( $class_name ) ) {
+			return;
+		}
+
+		// Construct file name.
+		$parts      = explode( '\\', $class_name );
+		$class_name = implode( '-', array_filter( $parts ) );
+		$file       = ECRANVILLAGE_DIR . '/inc/class.' . \strtolower( $class_name ) . '.php';
+		if ( file_exists( $file ) ) {
+			include_once $file;
+		}
 	}
 );
 
@@ -63,74 +68,86 @@ spl_autoload_register(
 * Film post type
 */
 
-// ACTIONS
+// ACTIONS.
 add_action( 'init', array( '\EcranVillage\Film', 'register_post_type' ) );
-add_action( 'init',  array( '\EcranVillage\Film', 'register_taxonomies' ) );
+add_action( 'init', array( '\EcranVillage\Film', 'register_taxonomies' ) );
 add_action( 'save_post', array( '\EcranVillage\Film', 'save_meta' ), 1, 2 );
 
-// FILTERS
+// FILTERS.
 add_filter( 'the_content', array( '\EcranVillage\Film', 'filter_content_pre' ), 1 );
-add_filter( 'the_content', array( '\EcranVillage\Film', 'filter_content_post' ), 20 ); // priority 20 runs after jetpack share icons
+add_filter( 'the_content', array( '\EcranVillage\Film', 'filter_content_post' ), 20 ); // Priority 20 runs after jetpack share icons.
 
 /**
 * Shortcodes
 */
+add_action(
+	'init',
+	function () {
+		add_shortcode( 'seances', array( '\EcranVillage\Shortcodes', 'seances' ) );
+		add_shortcode( 'applink', array( '\EcranVillage\Shortcodes', 'applink' ) );
 
-add_action( 'init', function() {
-	add_shortcode( 'seances', array( '\EcranVillage\Shortcodes', 'seances' ) );
-	//add_shortcode( 'séances', array( '\EcranVillage\Shortcodes', 'seances' ) );
-
-	add_shortcode( 'applink', array( '\EcranVillage\Shortcodes', 'applink' ) );
-
-	add_shortcode( 'etoiles', array( '\EcranVillage\Shortcodes', 'etoiles' ) );
-	//add_shortcode( 'étoiles', array( '\EcranVillage\Shortcodes', 'etoiles' ) );
-
-	//add_filter( 'get_the_excerpt', 'do_shortcode', 99 );
-} );
+		add_shortcode( 'etoiles', array( '\EcranVillage\Shortcodes', 'etoiles' ) );
+		// Allow shortcodes in excerpts with add_filter( 'get_the_excerpt', 'do_shortcode', 99 ).
+	}
+);
 
 /**
 * API Endpoints
 */
-
-add_action( 'rest_api_init', function () {
-	register_rest_route( 'ecranvillage-api/v2', '/export', array(
-		'methods' => 'GET',
-		'callback' => array('\EcranVillage\API','response'),
-		'permission_callback' => '__return_true'
-	) );
-	register_rest_route( 'ecranvillage-api/v2', '/export/download', array(
-		'methods' => 'GET',
-		'callback' => array('\EcranVillage\API','download_response'),
-		'permission_callback' => '__return_true'
-	) );
-} );
+add_action(
+	'rest_api_init',
+	function () {
+		register_rest_route(
+			'ecranvillage-api/v2',
+			'/export',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( '\EcranVillage\API', 'response' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+		register_rest_route(
+			'ecranvillage-api/v2',
+			'/export/download',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( '\EcranVillage\API', 'download_response' ),
+				'permission_callback' => '__return_true',
+			)
+		);
+	}
+);
 
 /**
 * Admin page
 */
-
-add_action( 'admin_menu', function () {
-  add_menu_page( 'Plannings', 'Plannings', 'edit_pages', 'ecranvillage-admin', array('\EcranVillage\Admin','page'), 'dashicons-calendar-alt' );
-} );
+add_action(
+	'admin_menu',
+	function () {
+		add_menu_page( 'Plannings', 'Plannings', 'edit_pages', 'ecranvillage-admin', array( '\EcranVillage\Admin', 'page' ), 'dashicons-calendar-alt' );
+	}
+);
 
 /**
-* De/activation
-*/
-
-register_activation_hook( __FILE__, 'ev_activate' );
-
+ * Activation
+ */
 function ev_activate() {
-	// force rewrite rules to be recrated at the right time
-	delete_option('rewrite_rules');
+	// Force rewrite rules to be recrated at the right time.
+	delete_option( 'rewrite_rules' );
 
 	\EcranVillage\Film::register_post_type();
 	\EcranVillage\Film::register_taxonomies();
 	\EcranVillage\Film::insert_terms();
 }
 
-register_deactivation_hook( __FILE__, 'ev_deactivate' );
+register_activation_hook( __FILE__, 'ev_activate' );
 
+/**
+ * De/activation
+ */
 function ev_deactivate() {
-	// force rewrite rules to be recrated at the right time
-	delete_option('rewrite_rules');
+	// Force rewrite rules to be recrated at the right time.
+	delete_option( 'rewrite_rules' );
 }
+
+register_deactivation_hook( __FILE__, 'ev_deactivate' );

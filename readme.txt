@@ -16,10 +16,13 @@ Film post type, JSON endpoint and seances shortcode to work in conjuntion with t
 
 == Upgrade Notice ==
 
-= 4.2 =
-Updated Film template + Audidescription
+= 4.2.1 =
+Clear transient caches when object cache active
 
 == Changelog ==
+
+= 4.2.1 =
+* FIX: clear transient caches when object cache active
 
 = 4.2 =
 * Remove Synopsis header from film template
