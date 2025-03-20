@@ -1,7 +1,7 @@
 === Écran Village ===
 Contributors: RavanH
 Tags: custom post type, film, shortcodes
-Stable tag: 4.2
+Stable tag: 4.2.1
 Requires at least: 4.4
 Tested up to: 5.5
 License: GPLv3 or later
