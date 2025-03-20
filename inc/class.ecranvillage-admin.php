@@ -42,7 +42,7 @@ class Admin {
 				switch ( $_GET['purge'] ) {
 					case 'films':
 						if ( self::delete_transient( 'films' ) ) {
-							$messages[] = 'Le cache de films est vidé avec succès.';
+							$messages[] = 'Le cache de films vidé avec succès.';
 						} else {
 							$messages[] = 'Le cache de films était déjà vide.';
 						}
@@ -50,7 +50,7 @@ class Admin {
 
 					case 'villages':
 						if ( self::delete_transient( 'villages' ) ) {
-							$messages[] = 'Le cache de villages est vidé avec succès.';
+							$messages[] = 'Le cache de villages vidé avec succès.';
 						} else {
 							$messages[] = 'Le cache de villages était déjà vide.';
 						}
@@ -76,9 +76,8 @@ class Admin {
 								++$i;
 							}
 						}
-						$messages[] = "Le cache de séances des films à l'affiche et à venir a été vidé avec succès. Un total de $i réponses mises en cache sont supprimées.";
 						if ( $i ) {
-							$messages[] = "Le cache de séances de $i films à l'affiche et à venir ont été vidé avec succès.";
+							$messages[] = "Le cache de séances de $i films à l'affiche et à venir vidé avec succès.";
 						} else {
 							$messages[] = 'Le cache de séances de films à l\'affiche et à venir était déjà vide.';
 						}
@@ -98,7 +97,7 @@ class Admin {
 							}
 						}
 						if ( $i ) {
-							$messages[] = "Le cache de séances de $i films ont été vidé avec succès.";
+							$messages[] = "Le cache de séances de $i films a été vidé avec succès.";
 						} else {
 							$messages[] = 'Le cache de séances de films était déjà vide.';
 						}
@@ -108,9 +107,9 @@ class Admin {
 						global $wpdb;
 						// Delete all meta data.
 						if ( \delete_metadata( 'post', 0, 'film_id', '', true ) ) {
-							$messages[] = 'Toutes les associations des films par ID ont été remis à zéro avec succès.';
+							$messages[] = 'Toutes les associations des films par ID remises à zéro avec succès.';
 						} else {
-							$messages[] = 'Aucune association de film par ID ont été trouvée.';
+							$messages[] = 'Aucune association de film par ID trouvée.';
 						}
 						break;
 				}
@@ -137,13 +136,16 @@ class Admin {
 	 * @param string $transient The transient name.
 	 */
 	private static function delete_transient( $transient ) {
+		$result = \delete_transient( $transient );
+
+		// When an object cache is active, make sure the DB entry is deleted as well.
 		if ( \wp_using_ext_object_cache() ) {
-			// When an object cache is active, make sure the DB entry is deleted as well.
-			$option_timeout = '_transient_timeout_' . $transient;
-			$option         = '_transient_' . $transient;
-			$result         = \delete_option( $option );
+			$result = \delete_option( '_transient_' . $transient );
+			if ( $result ) {
+				\delete_option( '_transient_timeout_' . $transient );
+			}
 		}
 
-		return \delete_transient( $transient );
+		return $result;
 	}
 }
