@@ -172,7 +172,7 @@ class Shortcodes {
 		// Determine the associated ID.
 		if ( empty( $id ) || ! \ctype_digit( $id ) ) {
 			// Get film id or wp_error.
-			$id = \EcranVillage\API::get_film_id( $title, $post->ID );
+			$id = \EcranVillage\API::get_film_id( $title );
 
 			// got error? abort mission.
 			if ( \is_wp_error( $id ) ) {
