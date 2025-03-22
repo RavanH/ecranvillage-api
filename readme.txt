@@ -1,7 +1,7 @@
 === Écran Village ===
 Contributors: RavanH
 Tags: custom post type, film, shortcodes
-Stable tag: 4.2.2
+Stable tag: 4.2.3
 Requires at least: 4.4
 Tested up to: 5.5
 License: GPLv3 or later
@@ -16,13 +16,14 @@ Film post type, JSON endpoint and seances shortcode to work in conjuntion with t
 
 == Upgrade Notice ==
 
-= 4.2.2 =
-Clear transient caches when object cache active
+= 4.2.3 =
+
+Bug fix: Transient caches when external persistent object cache active
 
 == Changelog ==
 
-= 4.2.2 =
-* FIX: clear transient caches when object cache active
+= 4.2.3 =
+* FIX: transient caches when external persistent object cache active
 
 = 4.2 =
 * Remove Synopsis header from film template
