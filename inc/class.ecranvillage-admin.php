@@ -41,7 +41,7 @@ class Admin {
 
 				switch ( $_GET['purge'] ) {
 					case 'films':
-						if ( self::delete_transient( 'films' ) ) {
+						if ( \delete_transient( 'films' ) ) {
 							$messages[] = 'Le cache de films vidé avec succès.';
 						} else {
 							$messages[] = 'Le cache de films était déjà vide.';
@@ -49,7 +49,7 @@ class Admin {
 						break;
 
 					case 'villages':
-						if ( self::delete_transient( 'villages' ) ) {
+						if ( \delete_transient( 'villages' ) ) {
 							$messages[] = 'Le cache de villages vidé avec succès.';
 						} else {
 							$messages[] = 'Le cache de villages était déjà vide.';
@@ -72,7 +72,7 @@ class Admin {
 							)
 						);
 						foreach ( $post_ids as $id ) {
-							if ( self::delete_transient( 'seances_' . $id ) ) {
+							if ( \delete_transient( 'seances_' . $id ) ) {
 								++$i;
 							}
 						}
@@ -92,7 +92,7 @@ class Admin {
 							)
 						);
 						foreach ( $post_ids as $id ) {
-							if ( self::delete_transient( 'seances_' . $id ) ) {
+							if ( \delete_transient( 'seances_' . $id ) ) {
 								++$i;
 							}
 						}
@@ -128,24 +128,5 @@ class Admin {
 		}
 
 		include ECRANVILLAGE_DIR . '/inc/views/admin-page.php';
-	}
-
-	/**
-	 * Delete transient from object cache and DB.
-	 *
-	 * @param string $transient The transient name.
-	 */
-	private static function delete_transient( $transient ) {
-		$result = \delete_transient( $transient );
-
-		// When an object cache is active, make sure the DB entry is deleted as well.
-		if ( \wp_using_ext_object_cache() ) {
-			$result = \delete_option( '_transient_' . $transient );
-			if ( $result ) {
-				\delete_option( '_transient_timeout_' . $transient );
-			}
-		}
-
-		return $result;
 	}
 }
