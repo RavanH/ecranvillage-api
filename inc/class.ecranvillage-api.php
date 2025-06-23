@@ -157,7 +157,7 @@ class API {
 			return $response;
 		}
 
-		$json = \json_decode( $response['body'] );
+		$json = \json_decode( $response['body'], true );
 
 		// return decoded json or WP error.
 		switch ( \json_last_error() ) {
