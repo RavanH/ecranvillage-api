@@ -228,10 +228,10 @@ class Shortcodes {
 					$timestamp = 0;
 				}
 				$villages_seances[ $village_id ][ $timestamp ] = array(
-					'version'           => isset( $_seance['version'] ) ? $_seance->version : '',
-					'audio_description' => isset( $_seance['audio_description'] ) ? $_seance->audio_description : '',
-					'info'              => isset( $_seance['extras'] ) ? $_seance->extras : '',
-					'annulee'           => isset( $_seance['annulee'] ) ? $_seance->annulee : '',
+					'version'           => isset( $_seance['version'] ) ? $_seance['version'] : '',
+					'audio_description' => isset( $_seance['audio_description'] ) ? $_seance['audio_description'] : '',
+					'info'              => isset( $_seance['extras'] ) ? $_seance['extras'] : '',
+					'annulee'           => isset( $_seance['annulee'] ) ? $_seance['annulee'] : '',
 				);
 			}
 		}
