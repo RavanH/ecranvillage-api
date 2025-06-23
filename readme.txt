@@ -22,6 +22,10 @@ Bug fix: Transient caches when external persistent object cache active
 
 == Changelog ==
 
+TODO
+* seances transients only for film post type!
+* fix json conversion (classes to array)
+
 = 4.2.3 =
 * FIX: transient caches when external persistent object cache active
 
