@@ -123,8 +123,8 @@ class API {
 		// try by title.
 		if ( ! empty( $title ) ) {
 			foreach ( $films_json as $film ) {
-				if ( \is_object( $film ) && $film->titrefilm == $title ) {
-					return (int) $film->id;
+				if ( \is_array( $film ) && isset( $film['titrefilm'] ) && $film['titrefilm'] === $title ) {
+					return (int) $film['id'];
 				}
 			}
 		}
@@ -132,8 +132,8 @@ class API {
 		// try by post_id.
 		if ( isset( $import_id ) ) {
 			foreach ( $films_json as $film ) {
-				if ( \is_object( $film ) && $film->import_id == $import_id ) {
-					return (int) $film->id;
+				if ( \is_array( $film ) && isset( $film['import_id'] ) && $film['import_id'] == $import_id ) {
+					return (int) $film['import_id'];
 				}
 			}
 		}
