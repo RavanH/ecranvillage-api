@@ -1,7 +1,7 @@
 === Écran Village ===
 Contributors: RavanH
 Tags: custom post type, film, shortcodes
-Stable tag: 4.2.3
+Stable tag: 4.2.4
 Requires at least: 4.4
 Tested up to: 5.5
 License: GPLv3 or later
@@ -16,15 +16,14 @@ Film post type, JSON endpoint and seances shortcode to work in conjuntion with t
 
 == Upgrade Notice ==
 
-= 4.2.3 =
+= 4.2.4 =
 
 Bug fix: Transient caches when external persistent object cache active
 
 == Changelog ==
 
-TODO
-* seances transients only for film post type!
-* fix json conversion (classes to array)
+= 4.2.4 =
+* Store json responses as nested arrays
 
 = 4.2.3 =
 * FIX: transient caches when external persistent object cache active
