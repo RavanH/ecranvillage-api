@@ -1,6 +1,6 @@
 <?php
 /**
- * Class EcranVillage_API
+ * Class EcranVillage Admin
  *
  * @package EcranVillage API
  * @link https://github.com/RavanH/ecranvillage-api/

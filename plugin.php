@@ -3,7 +3,7 @@
  * Plugin Name: Écran Village
  * Plugin URI:
  * Description: Films post type, JSON endpoint and seances shortcode for Plannings App Écran Village
- * Version: 4.2.4
+ * Version: 4.3.0-alpha1
  * Author: RavanH
  * Author URI: http://status301.net/
  * License: GPLv3
@@ -43,111 +43,30 @@ defined( 'ABSPATH' ) || exit;
 
 define( 'ECRANVILLAGE_DIR', __DIR__ );
 
+add_action( 'init', array( '\EcranVillage\Plugin', 'init' ) );
+
+register_activation_hook( __FILE__, array( '\EcranVillage\Plugin', 'activate' ) );
+register_deactivation_hook( __FILE__, array( '\EcranVillage\Plugin', 'deactivate' ) );
+
 /**
  * AUTOLOADER
  */
-
 spl_autoload_register(
 	function ( $class_name ) {
 		// Bail out if not inside EcranVillage namespace or class already exists.
-		if ( 0 !== strpos( $class_name, 'EcranVillage\\' ) || class_exists( $class_name ) ) {
+		if ( 0 !== strpos( $class_name, 'EcranVillage\\' ) ) {
 			return;
 		}
 
 		// Construct file name.
+		$class_name = str_replace( 'EcranVillage', 'inc', $class_name );
+		$class_name = str_replace( '_', '-', $class_name );
+		$class_name = strtolower( $class_name );
 		$parts      = explode( '\\', $class_name );
-		$class_name = implode( '-', array_filter( $parts ) );
-		$file       = ECRANVILLAGE_DIR . '/inc/class.' . \strtolower( $class_name ) . '.php';
+		$parts[]    = 'class-' . array_pop( $parts ) . '.php';
+		$file       = ECRANVILLAGE_DIR . DIRECTORY_SEPARATOR . implode( DIRECTORY_SEPARATOR, $parts );
 		if ( file_exists( $file ) ) {
 			include_once $file;
 		}
 	}
 );
-
-/**
-* Film post type
-*/
-
-// ACTIONS.
-add_action( 'init', array( '\EcranVillage\Film', 'register_post_type' ) );
-add_action( 'init', array( '\EcranVillage\Film', 'register_taxonomies' ) );
-add_action( 'save_post', array( '\EcranVillage\Film', 'save_meta' ), 1, 2 );
-
-// FILTERS.
-add_filter( 'the_content', array( '\EcranVillage\Film', 'filter_content_pre' ), 1 );
-add_filter( 'the_content', array( '\EcranVillage\Film', 'filter_content_post' ), 20 ); // Priority 20 runs after jetpack share icons.
-
-/**
-* Shortcodes
-*/
-add_action(
-	'init',
-	function () {
-		add_shortcode( 'seances', array( '\EcranVillage\Shortcodes', 'seances' ) );
-		add_shortcode( 'applink', array( '\EcranVillage\Shortcodes', 'applink' ) );
-
-		add_shortcode( 'etoiles', array( '\EcranVillage\Shortcodes', 'etoiles' ) );
-		// Allow shortcodes in excerpts with add_filter( 'get_the_excerpt', 'do_shortcode', 99 ).
-	}
-);
-
-/**
-* API Endpoints
-*/
-add_action(
-	'rest_api_init',
-	function () {
-		register_rest_route(
-			'ecranvillage-api/v2',
-			'/export',
-			array(
-				'methods'             => 'GET',
-				'callback'            => array( '\EcranVillage\API', 'response' ),
-				'permission_callback' => '__return_true',
-			)
-		);
-		register_rest_route(
-			'ecranvillage-api/v2',
-			'/export/download',
-			array(
-				'methods'             => 'GET',
-				'callback'            => array( '\EcranVillage\API', 'download_response' ),
-				'permission_callback' => '__return_true',
-			)
-		);
-	}
-);
-
-/**
-* Admin page
-*/
-add_action(
-	'admin_menu',
-	function () {
-		add_menu_page( 'Plannings', 'Plannings', 'edit_pages', 'ecranvillage-admin', array( '\EcranVillage\Admin', 'page' ), 'dashicons-calendar-alt' );
-	}
-);
-
-/**
- * Activation
- */
-function ev_activate() {
-	// Force rewrite rules to be recrated at the right time.
-	delete_option( 'rewrite_rules' );
-
-	\EcranVillage\Film::register_post_type();
-	\EcranVillage\Film::register_taxonomies();
-	\EcranVillage\Film::insert_terms();
-}
-
-register_activation_hook( __FILE__, 'ev_activate' );
-
-/**
- * De/activation
- */
-function ev_deactivate() {
-	// Force rewrite rules to be recrated at the right time.
-	delete_option( 'rewrite_rules' );
-}
-
-register_deactivation_hook( __FILE__, 'ev_deactivate' );
