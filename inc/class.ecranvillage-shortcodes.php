@@ -203,9 +203,9 @@ class Shortcodes {
 					continue;
 				}
 
-				$village_id              = \isset( $village['id'] ) ? $village['id'] : 0;
-				$commune                 = \isset( $village['commune']  ) ? $village['commune'] : '';
-				$salle                   = \isset( $village['salle'] ) ? ', ' . $village['salle'] : '';
+				$village_id              = isset( $village['id'] ) ? $village['id'] : 0;
+				$commune                 = isset( $village['commune']  ) ? $village['commune'] : '';
+				$salle                   = isset( $village['salle'] ) ? ', ' . $village['salle'] : '';
 				$villages[ $village_id ] = $commune . $salle;
 			}
 		}
@@ -220,18 +220,18 @@ class Shortcodes {
 				continue;
 			}
 
-			if ( ! isset( $film_id ) || ( \isset( $_seance['film_id'] ) && $_seance['film_id'] == $film_id ) ) {
-				$village_id = \isset( $_seance['village_id'] ) ? $_seance['village_id'] : 0;
-				if ( \isset( $_seance['horaire'] ) && ! empty( $_seance['horaire'] ) ) {
+			if ( ! isset( $film_id ) || ( isset( $_seance['film_id'] ) && $_seance['film_id'] == $film_id ) ) {
+				$village_id = isset( $_seance['village_id'] ) ? $_seance['village_id'] : 0;
+				if ( isset( $_seance['horaire'] ) && ! empty( $_seance['horaire'] ) ) {
 					$timestamp = \ctype_digit( $_seance['horaire'] ) ? $_seance['horaire'] : \strtotime( $_seance['horaire'] );
 				} else {
 					$timestamp = 0;
 				}
 				$villages_seances[ $village_id ][ $timestamp ] = array(
-					'version'           => \isset( $_seance['version'] ) ? $_seance->version : '',
-					'audio_description' => \isset( $_seance['audio_description'] ) ? $_seance->audio_description : '',
-					'info'              => \isset( $_seance['extras'] ) ? $_seance->extras : '',
-					'annulee'           => \isset( $_seance['annulee'] ) ? $_seance->annulee : '',
+					'version'           => isset( $_seance['version'] ) ? $_seance->version : '',
+					'audio_description' => isset( $_seance['audio_description'] ) ? $_seance->audio_description : '',
+					'info'              => isset( $_seance['extras'] ) ? $_seance->extras : '',
+					'annulee'           => isset( $_seance['annulee'] ) ? $_seance->annulee : '',
 				);
 			}
 		}
